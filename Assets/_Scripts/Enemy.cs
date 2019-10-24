@@ -7,6 +7,9 @@ using UnityEngine.UI;
 public class Enemy : MonoBehaviour
 {
     #region Variables
+    public delegate void LostALife(int lives);
+    public event LostALife OnLifeLost;
+
     [Header("NavMeshAgent Properties")]
     [Space]
     public NavMeshAgent agent;
@@ -17,12 +20,22 @@ public class Enemy : MonoBehaviour
     public float agentStoppingDistance = 0.5f;
     public float agentAngularSpeed = 400;
     public float agentAcceleration = 40;
-    
-    
+
+
     [Header("Enemy Statistics")]
-    public float health;
+    public EnemyType enemyType;
+    public EnemyArt enemyArt;
+    public float health; 
     public float moveSpeed;
     public float armour;
+    public float magicResist;
+    public int livesWorth;
+    public float goldReward;
+
+    [Header("EnemyUI")]
+    public Slider enemyHealthBar;
+    public Sprite enemyResistanceType;
+    public Text enemyLevel;
     // These enums are for assigning stats on start.
     public enum EnemyType
     {
@@ -45,6 +58,7 @@ public class Enemy : MonoBehaviour
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        wayPointParent = FindObjectOfType<WaypointParent>().GetComponent<Transform>();
         if (wayPointParent != null)
         {
             points = wayPointParent.GetComponentsInChildren<Transform>();
@@ -64,6 +78,10 @@ public class Enemy : MonoBehaviour
             agent.stoppingDistance = agentStoppingDistance;
             agent.angularSpeed = agentAngularSpeed;
             agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+            agent.autoBraking = false;
+            currentWayPoint = 1;
+
+            // The assigning of movespeed, health and armour/mr goes down here.
         }
         else
         {
@@ -113,6 +131,10 @@ public class Enemy : MonoBehaviour
     void LoseALife()
     {
         // Player should lose a life because the enemy reached the end of the level.
+        if (OnLifeLost != null)
+        {
+            OnLifeLost(livesWorth);
+        }
         // Make this an event.
         Destroy(gameObject);
     }
