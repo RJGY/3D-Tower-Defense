@@ -33,8 +33,6 @@ public class Enemy : MonoBehaviour
 
     [Header("EnemyUI")]
     public Slider enemyHealthBar;
-    public Sprite enemyResistanceType;
-    public Text enemyLevel;
 
     // These enums are for assigning stats on start.
     public enum EnemyType
@@ -83,6 +81,7 @@ public class Enemy : MonoBehaviour
             GameManager.Instance.OnGameEnded += Instance_OnGameEnded;
             // The assigning of movespeed, health and armour/mr goes down here.
             livesWorth = 1; // TEMP, DELETE LATER
+            health = 10;
         }
         else
         {
@@ -153,6 +152,12 @@ public class Enemy : MonoBehaviour
         }
         // Make this an event.
         Destroy(gameObject);
+    }
+
+    void TakeDamage(float attackDamage, float armourPenetration, float magicDamage, float magicResistPenetration, float pureDamage)
+    {
+        float damageTaken = pureDamage;
+        health -= damageTaken;
     }
     #endregion
 }

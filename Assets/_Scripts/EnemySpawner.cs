@@ -10,6 +10,7 @@ public class EnemySpawner : MonoBehaviour
     #region Variables
     [Header("Enemy Spawner Variables")]
     public Enemy enemyPrefab;
+    public List<Enemy> enemyList;
     private Vector3 enemySpawnpoint;
     private Coroutine spawnEnemyCoroutine;
 
@@ -35,6 +36,7 @@ public class EnemySpawner : MonoBehaviour
     {
         Enemy enemy = Instantiate(enemyPrefab, enemySpawnpoint, Quaternion.identity);
         enemy.OnLifeLost += Enemy_OnLifeLost;
+        enemyList.Add(enemy);
         yield return new WaitForSeconds(2);
         spawnEnemyCoroutine = StartCoroutine(SpawnEnemy());
     }
@@ -46,6 +48,7 @@ public class EnemySpawner : MonoBehaviour
     private void Enemy_OnLifeLost(int lives, Enemy enemy)
     {
         enemy.OnLifeLost -= Enemy_OnLifeLost;
+        enemyList.Remove(enemy);
         if (OnLifeLostGM != null)
         {
             OnLifeLostGM(lives);
