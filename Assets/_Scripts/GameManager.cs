@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
 
         livesText = FindObjectOfType<LivesText>().GetComponent<Text>();
         moneyText = FindObjectOfType<MoneyText>().GetComponent<Text>();
+        enemySpawner = FindObjectOfType<EnemySpawner>();
     }
     #endregion
 
@@ -31,6 +32,7 @@ public class GameManager : MonoBehaviour
     public int lives;
     public int money;
     public int currentWave;
+    private EnemySpawner enemySpawner;
 
     [Header("UI Variables")]
     
@@ -43,9 +45,10 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        enemySpawner.OnGameEnded += EnemySpawner_OnGameEnded;
+
         lives = 20;
         money = 100;
-
         livesText.text = lives.ToString();
         moneyText.text = money.ToString();
     }
@@ -53,7 +56,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Functions
-    public void GameOver()
+    private void EnemySpawner_OnGameEnded()
     {
         if (OnGameEnded != null)
         {

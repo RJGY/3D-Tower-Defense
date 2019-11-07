@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    
+    public delegate void GameEnded();
+    public event GameEnded OnGameEnded;
+
     #region Variables
     [Header("Enemy Spawner Variables")]
     public Enemy enemyPrefab;
@@ -48,11 +50,14 @@ public class EnemySpawner : MonoBehaviour
     private void Enemy_OnLifeLost(int lives, Enemy enemy)
     {
         enemy.OnLifeLost -= Enemy_OnLifeLost;
-        GameManager.Instance.lives -= lives;
+        GameManager.Instance.lives -= lives; //MAKE THIS LINE AN EVENT TO GAMEMANAGER
         GameManager.Instance.UpdateLives();
         if (GameManager.Instance.lives <= 0)
         {
-            GameManager.Instance.GameOver();
+            if (OnGameEnded != null)
+            {
+                OnGameEnded();
+            }
         }
     }
 
