@@ -7,35 +7,37 @@ using UnityEngine.UI;
 public class Enemy : MonoBehaviour
 {
     #region Variables
-    public delegate void LostALife(int lives);
+    public delegate void LostALife(int lives, Enemy enemy);
     public event LostALife OnLifeLost;
 
     [Header("NavMeshAgent Properties")]
     [Space]
-    public NavMeshAgent agent;
-    public Transform wayPointParent;
-    public Transform[] points;
-    public int currentWayPoint;
-    public float wayPointDistance = 1.5f;
-    public float agentStoppingDistance = 0.5f;
-    public float agentAngularSpeed = 400;
-    public float agentAcceleration = 40;
-
+    private NavMeshAgent agent;
+    private Transform wayPointParent;
+    private Transform[] points;
+    private int currentWayPoint;
+    private float wayPointDistance = 1.5f;
+    private float agentStoppingDistance = 0.5f;
+    private float agentAngularSpeed = 400;
+    private float agentAcceleration = 40;
+    private bool agentCanMove = true;
+    private float agentMoveSpeed = 5; // TEMP VARIABLE DELETE LATER
 
     [Header("Enemy Statistics")]
-    public EnemyType enemyType;
-    public EnemyArt enemyArt;
-    public float health; 
-    public float moveSpeed;
-    public float armour;
-    public float magicResist;
-    public int livesWorth;
-    public float goldReward;
+    private EnemyType enemyType;
+    private EnemySpecies enemyArt;
+    private float health;
+    private float moveSpeed;
+    private float armour;
+    private float magicResist;
+    private int livesWorth;
+    private float goldReward;
 
     [Header("EnemyUI")]
     public Slider enemyHealthBar;
     public Sprite enemyResistanceType;
     public Text enemyLevel;
+
     // These enums are for assigning stats on start.
     public enum EnemyType
     {
@@ -43,7 +45,7 @@ public class Enemy : MonoBehaviour
         Fast,
     }
 
-    public enum EnemyArt
+    public enum EnemySpecies
     {
         Orc,
         Goblin,
@@ -80,8 +82,9 @@ public class Enemy : MonoBehaviour
             agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
             agent.autoBraking = false;
             currentWayPoint = 1;
-
+            GameManager.Instance.OnGameEnded += Instance_OnGameEnded;
             // The assigning of movespeed, health and armour/mr goes down here.
+            livesWorth = 1; // TEMP, DELETE LATER
         }
         else
         {
@@ -89,10 +92,22 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    private void Instance_OnGameEnded()
+    {
+        agentCanMove = false;
+    }
+
     // Update is called once per frame
     void Update()
     {
-        GoToEnd();
+        if (agentCanMove)
+        {
+            GoToEnd();
+        }
+        else
+        {
+            agent.isStopped = true;
+        }
         // Need a gamemanager to check if the enemy is slowed or not.
         // Make slowing enemies an event.
     }
@@ -117,7 +132,6 @@ public class Enemy : MonoBehaviour
             }
             else
             {
-                Debug.Log("I SHOULD DIE HERE");
                 LoseALife();
             }
         }
@@ -133,7 +147,8 @@ public class Enemy : MonoBehaviour
         // Player should lose a life because the enemy reached the end of the level.
         if (OnLifeLost != null)
         {
-            OnLifeLost(livesWorth);
+            GameManager.Instance.OnGameEnded -= Instance_OnGameEnded;
+            OnLifeLost(livesWorth, this);
         }
         // Make this an event.
         Destroy(gameObject);

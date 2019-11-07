@@ -4,35 +4,62 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    // Start is called before the first frame update
+    
     #region Variables
+    [Header("Enemy Spawner Variables")]
     public Enemy enemyPrefab;
-    public Transform enemySpawnpoint;
-    public Coroutine spawnEnemyCoroutine;
+    private Vector3 enemySpawnpoint;
+    private Coroutine spawnEnemyCoroutine;
+
     #endregion
+
+    #region Monobehaviour
+    // Start is called before the first frame update
     void Start()
     {
-        enemySpawnpoint = this.transform;
+        GameManager.Instance.OnGameEnded += GameManager_Instance_OnGameEnded;
+        enemySpawnpoint = transform.position;
         spawnEnemyCoroutine = StartCoroutine(SpawnEnemy());
     }
+
+    
 
     // Update is called once per frame
     void Update()
     {
-    
         
     }
 
+    #endregion
+
+    #region Coroutines
     IEnumerator SpawnEnemy()
     {
-        Enemy enemy = Instantiate(enemyPrefab, enemySpawnpoint.position, Quaternion.identity);
+        Enemy enemy = Instantiate(enemyPrefab, enemySpawnpoint, Quaternion.identity);
         enemy.OnLifeLost += Enemy_OnLifeLost;
         yield return new WaitForSeconds(2);
         spawnEnemyCoroutine = StartCoroutine(SpawnEnemy());
     }
 
-    private void Enemy_OnLifeLost(int lives)
+    #endregion
+
+    #region Functions
+
+    private void Enemy_OnLifeLost(int lives, Enemy enemy)
     {
+        enemy.OnLifeLost -= Enemy_OnLifeLost;
         GameManager.Instance.lives -= lives;
+        GameManager.Instance.UpdateLives();
+        if (GameManager.Instance.lives <= 0)
+        {
+            GameManager.Instance.GameOver();
+        }
     }
+
+    private void GameManager_Instance_OnGameEnded()
+    {
+        StopCoroutine(spawnEnemyCoroutine);
+    }
+
+    #endregion
 }
