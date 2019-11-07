@@ -16,18 +16,16 @@ public class EnemySpawner : MonoBehaviour
     #endregion
 
     #region Monobehaviour
+    private void Awake()
+    {
+        enemySpawnpoint = transform.position;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         GameManager.Instance.OnGameEnded += GameManager_Instance_OnGameEnded;
-        enemySpawnpoint = transform.position;
         spawnEnemyCoroutine = StartCoroutine(SpawnEnemy());
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     #endregion

@@ -52,8 +52,6 @@ public class GameManager : MonoBehaviour
         moneyText.text = money.ToString();
     }
 
-
-
     #endregion
 
     #region Functions

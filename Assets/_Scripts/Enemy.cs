@@ -11,17 +11,15 @@ public class Enemy : MonoBehaviour
     public event LostALife OnLifeLost;
 
     [Header("NavMeshAgent Properties")]
-    [Space]
     private NavMeshAgent agent;
     private Transform wayPointParent;
     private Transform[] points;
     private int currentWayPoint;
     private float wayPointDistance = 1.5f;
-    private float agentStoppingDistance = 0.5f;
+    private float agentStoppingDistance = 0f;
     private float agentAngularSpeed = 400;
     private float agentAcceleration = 40;
     private bool agentCanMove = true;
-    private float agentMoveSpeed = 5; // TEMP VARIABLE DELETE LATER
 
     [Header("Enemy Statistics")]
     private EnemyType enemyType;
@@ -106,7 +104,10 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            agent.isStopped = true;
+            if (!agent.isStopped)
+            {
+                agent.isStopped = true;
+            }
         }
         // Need a gamemanager to check if the enemy is slowed or not.
         // Make slowing enemies an event.
