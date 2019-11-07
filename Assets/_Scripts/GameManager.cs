@@ -29,9 +29,9 @@ public class GameManager : MonoBehaviour
 
     #region Variables
     [Header("Game Variables")]
-    public int lives;
-    public int money;
-    public int currentWave;
+    private int lives;
+    private int money;
+    private int currentWave;
     private EnemySpawner enemySpawner;
 
     [Header("UI Variables")]
@@ -45,30 +45,41 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        enemySpawner.OnGameEnded += EnemySpawner_OnGameEnded;
-
+        enemySpawner.OnLifeLostGM += EnemySpawner_OnLifeLostGM;
         lives = 20;
         money = 100;
         livesText.text = lives.ToString();
         moneyText.text = money.ToString();
     }
 
+
+
     #endregion
 
     #region Functions
-    private void EnemySpawner_OnGameEnded()
+    private void EnemySpawner_OnLifeLostGM(int lives)
+    {
+        this.lives -= lives;
+        UpdateLives();
+        if (this.lives <= 0)
+        {
+            GameOver();
+        }
+    }
+
+    private void GameOver()
     {
         if (OnGameEnded != null)
         {
             OnGameEnded();
         }
     }
-    public void UpdateLives()
+    private void UpdateLives()
     {
         livesText.text = lives.ToString();
     }
 
-    public void UpdateMoney()
+    private void UpdateMoney()
     {
         moneyText.text = money.ToString();
     }

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public delegate void GameEnded();
-    public event GameEnded OnGameEnded;
+    public delegate void LoseALifeGM(int lives);
+    public event LoseALifeGM OnLifeLostGM;
 
     #region Variables
     [Header("Enemy Spawner Variables")]
@@ -23,8 +23,6 @@ public class EnemySpawner : MonoBehaviour
         enemySpawnpoint = transform.position;
         spawnEnemyCoroutine = StartCoroutine(SpawnEnemy());
     }
-
-    
 
     // Update is called once per frame
     void Update()
@@ -50,14 +48,9 @@ public class EnemySpawner : MonoBehaviour
     private void Enemy_OnLifeLost(int lives, Enemy enemy)
     {
         enemy.OnLifeLost -= Enemy_OnLifeLost;
-        GameManager.Instance.lives -= lives; //MAKE THIS LINE AN EVENT TO GAMEMANAGER
-        GameManager.Instance.UpdateLives();
-        if (GameManager.Instance.lives <= 0)
+        if (OnLifeLostGM != null)
         {
-            if (OnGameEnded != null)
-            {
-                OnGameEnded();
-            }
+            OnLifeLostGM(lives);
         }
     }
 
