@@ -150,9 +150,10 @@ public class Enemy : MonoBehaviour
             GameManager.Instance.OnGameEnded -= Instance_OnGameEnded;
             OnLifeLost(livesWorth, this);
         }
-        // Make this an event.
         Destroy(gameObject);
     }
+
+
 
     void TakeDamage(float attackDamage, float armourPenetration, float magicDamage, float magicResistPenetration, float pureDamage)
     {

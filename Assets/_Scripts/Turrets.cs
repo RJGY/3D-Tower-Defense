@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Turrets : MonoBehaviour
 {
+    public delegate void DamageEnemy(float attackDamage, float armourPenetration, float magicDamage, float magicResistPenetration, float pureDamage);
+    public event DamageEnemy OnTookDamage;
+
     [Header("Turret Variables")]
     private float attackRange;
     private float attackSpeed; // Measured in attacks per second.
@@ -19,6 +22,9 @@ public class Turrets : MonoBehaviour
     private EnemySpawner enemySpawner;
     private TurretType turretType;
     private AttackType attackType;
+    [SerializeField]
+    private Projectile projectilePrefab;
+
 
     public enum TurretType
     {
@@ -121,7 +127,6 @@ public class Turrets : MonoBehaviour
         {
             Transform targetedEnemy;
             turretCanAttack = false;
-            // Attack stuff goes here
             switch (attackType)
             {
                 case AttackType.First:
@@ -140,9 +145,16 @@ public class Turrets : MonoBehaviour
                     targetedEnemy = TargetLast();
                     break;
             }
+            Projectile projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity, transform);
+            projectile.OnEnemyHit += Projectile_OnDamageDealt;
 
             StartCoroutine(AttackCooldown());
         }
+    }
+
+    private void Projectile_OnDamageDealt(Enemy enemy)
+    {
+
     }
 
     IEnumerator AttackCooldown()

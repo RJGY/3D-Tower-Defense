@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    public delegate void DoDamage(float attackDamage, float armourPenetration, float magicDamage, float magicResistPenetration, float pureDamage);
-    public event DoDamage OnDamageDealt;
+    public delegate void HitEnemy(Enemy enemy);
+    public event HitEnemy OnEnemyHit;
 
     private float attackDamage;
     private float magicDamage;
@@ -16,10 +16,19 @@ public class Projectile : MonoBehaviour
     private float slowAmount;
     private float projectileSpeed;
 
+    public enum ProjectileArt
+    {
+        CannonBall,
+        Arrow,
+        FireBall,
+        Lightning,
+        Undefined
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -32,14 +41,20 @@ public class Projectile : MonoBehaviour
     {
         if (other.GetComponent<Enemy>() != null)
         {
-            if (OnDamageDealt != null)
+            Enemy enemy = other.GetComponent<Enemy>();
+            if (OnEnemyHit != null)
             {
-                OnDamageDealt(attackDamage, armourPenetration, magicDamage, magicResistPenetration, pureDamage);
+                OnEnemyHit(enemy);
             }
             else
             {
                 Debug.LogError("Nothing is subscribed to OnDamageDealt");
             }
         }
+    }
+
+    private void GoTowardsTargettedEnemy(Transform enemy)
+    {
+
     }
 }
