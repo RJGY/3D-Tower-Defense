@@ -36,9 +36,17 @@ public class EnemySpawner : MonoBehaviour
     {
         Enemy enemy = Instantiate(enemyPrefab, enemySpawnpoint, Quaternion.identity);
         enemy.OnLifeLost += Enemy_OnLifeLost;
+        enemy.JustDied += Enemy_JustDied;
         enemyList.Add(enemy);
         yield return new WaitForSeconds(2);
         spawnEnemyCoroutine = StartCoroutine(SpawnEnemy());
+    }
+
+    private void Enemy_JustDied(Enemy enemy)
+    {
+        enemyList.Remove(enemy);
+        enemy.OnLifeLost -= Enemy_OnLifeLost;
+        enemy.JustDied -= Enemy_JustDied;
     }
 
     #endregion
@@ -48,6 +56,7 @@ public class EnemySpawner : MonoBehaviour
     private void Enemy_OnLifeLost(int lives, Enemy enemy)
     {
         enemy.OnLifeLost -= Enemy_OnLifeLost;
+        enemy.JustDied -= Enemy_JustDied;
         enemyList.Remove(enemy);
         if (OnLifeLostGM != null)
         {

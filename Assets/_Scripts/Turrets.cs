@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class Turrets : MonoBehaviour
 {
-    public delegate void DamageEnemy(float attackDamage, float armourPenetration, float magicDamage, float magicResistPenetration, float pureDamage);
+    public delegate void DamageEnemy(float attackDamage, float armourPenetration, float magicDamage, float magicResistPenetration, float pureDamage, Turrets turret, Projectile projectile);
     public event DamageEnemy OnTookDamage;
+
+    public delegate void SendEnemy(Transform enemyTransform, float projectileSpeed, int splashRange);
+    public event SendEnemy OnSend;
 
     [Header("Turret Variables")]
     private float attackRange;
@@ -59,6 +62,8 @@ public class Turrets : MonoBehaviour
         pureDamage = 5; // TEMP, DELETE LATER
         attackRange = 10;
         attackSpeed = 1;
+        attackType = AttackType.Closest;
+        projectileSpeed = 50;
         turretCanAttack = true;
     }
 
@@ -144,17 +149,39 @@ public class Turrets : MonoBehaviour
                 case AttackType.Last:
                     targetedEnemy = TargetLast();
                     break;
+
+                default:
+                    targetedEnemy = null;
+                    Debug.Log("Cannot Attack");
+                    return;
             }
+            
             Projectile projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity, transform);
+            if (OnSend != null & targetedEnemy != null)
+            {
+                OnSend(targetedEnemy, projectileSpeed, Mathf.RoundToInt(splashRange));
+            }
+            else
+            {
+                Debug.Log("No Target");
+            }
             projectile.OnEnemyHit += Projectile_OnDamageDealt;
 
             StartCoroutine(AttackCooldown());
         }
     }
 
-    private void Projectile_OnDamageDealt(Enemy enemy)
+    private void Projectile_OnDamageDealt(Projectile projectile)
     {
-
+        if (OnTookDamage != null)
+        { 
+            OnTookDamage(attackDamage, armourPenetration, magicDamage, magicResistPenetration, pureDamage, this, projectile);
+        }
+        else
+        {
+            Debug.Log("Enemy did not take damage");
+        }
+        projectile.OnEnemyHit -= Projectile_OnDamageDealt;
     }
 
     IEnumerator AttackCooldown()

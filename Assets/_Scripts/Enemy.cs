@@ -9,6 +9,8 @@ public class Enemy : MonoBehaviour
     #region Variables
     public delegate void LostALife(int lives, Enemy enemy);
     public event LostALife OnLifeLost;
+    public delegate void EnemyKilled(Enemy enemy);
+    public event EnemyKilled JustDied;
 
     [Header("NavMeshAgent Properties")]
     private NavMeshAgent agent;
@@ -153,12 +155,46 @@ public class Enemy : MonoBehaviour
         Destroy(gameObject);
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.GetComponent<Projectile>() != null)
+        {
+            other.GetComponent<Projectile>().SendBackToEnemy += Enemy_OnEnemyHit;
+            Debug.Log("idk whats wrongs");
+        }
+    }
 
+    private void Enemy_OnEnemyHit(Turrets turret)
+    {
+        turret.OnTookDamage += TakeDamage;
+    }
 
-    void TakeDamage(float attackDamage, float armourPenetration, float magicDamage, float magicResistPenetration, float pureDamage)
+    void TakeDamage(float attackDamage, float armourPenetration, float magicDamage, float magicResistPenetration, float pureDamage, Turrets turret, Projectile projectile)
     {
         float damageTaken = pureDamage;
+        float effectiveArmour = armour - armourPenetration;
+        float effectiveMagicResist = magicResist - magicResistPenetration;
+        damageTaken += attackDamage * (1 - (effectiveArmour / (effectiveArmour + 100)));
+        damageTaken += magicDamage * (1 - (effectiveMagicResist / (effectiveMagicResist + 100)));
         health -= damageTaken;
+
+        turret.OnTookDamage -= TakeDamage;
+        projectile.SendBackToEnemy -= Enemy_OnEnemyHit;
+
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        GameManager.Instance.OnGameEnded -= Instance_OnGameEnded;
+        if (JustDied != null)
+        {
+            JustDied(this);
+        }
+        Destroy(gameObject);
     }
     #endregion
 }

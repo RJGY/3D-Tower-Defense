@@ -88,7 +88,7 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299874859197234572}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.5
   m_Height: 2
@@ -106,22 +106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 728661f9309fd6049900e1940c246c1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agent: {fileID: 0}
-  wayPointParent: {fileID: 0}
-  points: []
-  currentWayPoint: 0
-  wayPointDistance: 1.5
-  agentStoppingDistance: 0.5
-  agentAngularSpeed: 400
-  agentAcceleration: 40
-  enemyType: 0
-  enemyArt: 0
-  health: 0
-  moveSpeed: 0
-  armour: 0
-  magicResist: 0
-  livesWorth: 0
-  goldReward: 0
+  enemyHealthBar: {fileID: 0}
 --- !u!195 &1299874859197234573
 NavMeshAgent:
   m_ObjectHideFlags: 0
