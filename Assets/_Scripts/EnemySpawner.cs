@@ -38,7 +38,7 @@ public class EnemySpawner : MonoBehaviour
         enemy.OnLifeLost += Enemy_OnLifeLost;
         enemy.JustDied += Enemy_JustDied;
         enemyList.Add(enemy);
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(0.66f);
         spawnEnemyCoroutine = StartCoroutine(SpawnEnemy());
     }
 

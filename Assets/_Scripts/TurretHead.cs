@@ -4,15 +4,21 @@ using UnityEngine;
 
 public class TurretHead : MonoBehaviour
 {
-    // Start is called before the first frame update
+    private Turrets turret;
+
+    private void Awake()
+    {
+        turret = GetComponentInParent<Turrets>();
+    }
+    
     void Start()
     {
-        
+        turret.OnLookAtEnemy += Turret_OnLookAtEnemy;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Turret_OnLookAtEnemy(Vector3 enemyDirection)
     {
-        
+        transform.rotation = Quaternion.LookRotation(enemyDirection);
+        transform.eulerAngles -= new Vector3(-90, 180, 0);
     }
 }

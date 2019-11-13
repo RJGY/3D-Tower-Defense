@@ -7,8 +7,11 @@ public class Turrets : MonoBehaviour
     public delegate void DamageEnemy(float attackDamage, float armourPenetration, float magicDamage, float magicResistPenetration, float pureDamage, Turrets turret, Projectile projectile);
     public event DamageEnemy OnTookDamage;
 
-    public delegate void SendEnemy(Transform enemyTransform, float projectileSpeed, int splashRange);
+    public delegate void SendEnemy(Transform enemyTransform, float projectileSpeed, float splashRange);
     public event SendEnemy OnSend;
+
+    public delegate void LookAtEnemy(Vector3 enemyDirection);
+    public event LookAtEnemy OnLookAtEnemy;
 
     [Header("Turret Variables")]
     private float attackRange;
@@ -22,6 +25,8 @@ public class Turrets : MonoBehaviour
     private float slowAmount;
     private float projectileSpeed;
     private bool turretCanAttack;
+    private float sellValue;
+    private TurretHead turretHead;
     private EnemySpawner enemySpawner;
     private TurretType turretType;
     private AttackType attackType;
@@ -53,17 +58,19 @@ public class Turrets : MonoBehaviour
     private void Awake()
     {
         enemySpawner = FindObjectOfType<EnemySpawner>();
+        turretHead = GetComponentInChildren<TurretHead>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
         turretType = TurretType.Archer;
-        pureDamage = 5; // TEMP, DELETE LATER
+        pureDamage = 2.5f; // TEMP, DELETE LATER
         attackRange = 10;
         attackSpeed = 1;
-        attackType = AttackType.Closest;
-        projectileSpeed = 50;
+        attackType = AttackType.Last;
+        splashRange = 10;
+        projectileSpeed = 30;
         turretCanAttack = true;
     }
 
@@ -84,6 +91,7 @@ public class Turrets : MonoBehaviour
             if (Vector3.Distance(transform.position, enemy.transform.position) < attackRange)
             {
                 inRange = true;
+                break;
             }
         }
         return inRange;
@@ -101,7 +109,7 @@ public class Turrets : MonoBehaviour
 
             else
             {
-                if (Vector3.Distance(enemy.transform.position, transform.position) < Vector3.Distance(closestEnemy.transform.position, transform.position))
+                if (Vector3.Distance(enemy.transform.position, transform.position) < Vector3.Distance(closestEnemy.position, transform.position))
                 {
                     closestEnemy = enemy.transform;
                 }
@@ -113,60 +121,116 @@ public class Turrets : MonoBehaviour
 
     Transform TargetFirst()
     {
-        return null;
+        Transform firstEnemy = null;
+        foreach (Enemy enemy in enemySpawner.enemyList)
+        {
+            if (Vector3.Distance(enemy.transform.position, transform.position) > attackRange)
+            {
+                continue;
+            }
+
+            firstEnemy = enemy.transform;
+            break;
+        }
+        return firstEnemy;
     }
 
     Transform TargetStrongest()
     {
-        return null;
+        Enemy strongestEnemy = null;
+        foreach (Enemy enemy in enemySpawner.enemyList)
+        {
+            if (Vector3.Distance(enemy.transform.position, transform.position) > attackRange)
+            {
+                continue;
+            }
+
+            if (strongestEnemy == null)
+            {
+                strongestEnemy = enemy;
+            }
+            else
+            {
+                // Make this an event.
+                if (strongestEnemy.GetHealth() < enemy.GetHealth())
+                {
+                    strongestEnemy = enemy;
+                }
+            }
+        }
+
+        return strongestEnemy.transform;
     }
 
     Transform TargetLast()
     {
-        return null;
+        Transform lastEnemy = null;
+        foreach (Enemy enemy in enemySpawner.enemyList)
+        {
+            if (Vector3.Distance(enemy.transform.position, transform.position) > attackRange)
+            {
+                continue;
+            }
+
+            lastEnemy = enemy.transform;
+        }
+        return lastEnemy;
     }
 
     void Attack()
     {
+        Transform targetedEnemy;
+        Vector3 targetPosition;
+        switch (attackType)
+        {
+            case AttackType.First:
+                targetedEnemy = TargetFirst();
+                break;
+
+            case AttackType.Closest:
+                targetedEnemy = TargetClosest();
+                break;
+
+            case AttackType.Strongest:
+                targetedEnemy = TargetStrongest();
+                break;
+
+            case AttackType.Last:
+                targetedEnemy = TargetLast();
+                break;
+
+            default:
+                targetedEnemy = null;
+                Debug.Log("Cannot Attack");
+                return;
+        }
+
+        // MAKE THIS AN EVENT.
+        targetPosition = targetedEnemy.position - transform.position;
+        if (OnLookAtEnemy != null)
+        {
+            OnLookAtEnemy(targetPosition);
+        }
+        else
+        {
+            Debug.Log("Turret head isn't connected.");
+        }
+
         if (turretCanAttack)
         {
-            Transform targetedEnemy;
             turretCanAttack = false;
-            switch (attackType)
-            {
-                case AttackType.First:
-                    targetedEnemy = TargetFirst();
-                    break;
 
-                case AttackType.Closest:
-                    targetedEnemy = TargetClosest();
-                    break;
-
-                case AttackType.Strongest:
-                    targetedEnemy = TargetStrongest();
-                    break;
-
-                case AttackType.Last:
-                    targetedEnemy = TargetLast();
-                    break;
-
-                default:
-                    targetedEnemy = null;
-                    Debug.Log("Cannot Attack");
-                    return;
-            }
-            
-            Projectile projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity, transform);
+            Projectile projectile = Instantiate(projectilePrefab, turretHead.transform.position, Quaternion.identity, transform);
             if (OnSend != null & targetedEnemy != null)
             {
-                OnSend(targetedEnemy, projectileSpeed, Mathf.RoundToInt(splashRange));
+                OnSend(targetedEnemy, projectileSpeed, splashRange);
             }
             else
             {
                 Debug.Log("No Target");
             }
             projectile.OnEnemyHit += Projectile_OnDamageDealt;
-
+            projectile.OnSplashHit += Projectile_OnSplashDamageDealt;
             StartCoroutine(AttackCooldown());
         }
     }
@@ -181,7 +245,22 @@ public class Turrets : MonoBehaviour
         {
             Debug.Log("Enemy did not take damage");
         }
+
         projectile.OnEnemyHit -= Projectile_OnDamageDealt;
+    }
+
+    private void Projectile_OnSplashDamageDealt(Projectile projectile)
+    {
+        if (OnTookDamage != null)
+        {
+            OnTookDamage(attackDamage * 0.5f, armourPenetration, magicDamage * 0.5f, magicResistPenetration, pureDamage, this, projectile);
+        }
+        else
+        {
+            Debug.Log("Enemy did not take splash damage");
+        }
+
+        projectile.OnEnemyHit -= Projectile_OnSplashDamageDealt;
     }
 
     IEnumerator AttackCooldown()

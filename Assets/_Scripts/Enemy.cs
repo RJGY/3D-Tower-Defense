@@ -11,6 +11,8 @@ public class Enemy : MonoBehaviour
     public event LostALife OnLifeLost;
     public delegate void EnemyKilled(Enemy enemy);
     public event EnemyKilled JustDied;
+    public delegate void SendHealth(float health);
+    public event SendHealth OnHealthSent;
 
     [Header("NavMeshAgent Properties")]
     private NavMeshAgent agent;
@@ -26,6 +28,7 @@ public class Enemy : MonoBehaviour
     [Header("Enemy Statistics")]
     private EnemyType enemyType;
     private EnemySpecies enemyArt;
+    private float maxHealth;
     private float health;
     private float moveSpeed;
     private float armour;
@@ -34,7 +37,8 @@ public class Enemy : MonoBehaviour
     private float goldReward;
 
     [Header("EnemyUI")]
-    public Slider enemyHealthBar;
+    private Image healthImage;
+
 
     // These enums are for assigning stats on start.
     public enum EnemyType
@@ -57,8 +61,10 @@ public class Enemy : MonoBehaviour
     #region MonoBehavior
     private void Awake()
     {
+        healthImage = FindObjectOfType<HealthBar>().GetComponent<Image>();
         agent = GetComponent<NavMeshAgent>();
         wayPointParent = FindObjectOfType<WaypointParent>().GetComponent<Transform>();
+
         if (wayPointParent != null)
         {
             points = wayPointParent.GetComponentsInChildren<Transform>();
@@ -83,12 +89,15 @@ public class Enemy : MonoBehaviour
             GameManager.Instance.OnGameEnded += Instance_OnGameEnded;
             // The assigning of movespeed, health and armour/mr goes down here.
             livesWorth = 1; // TEMP, DELETE LATER
-            health = 10;
+            maxHealth = 10;
+            health = maxHealth;
         }
         else
         {
             Debug.LogError("NO AGENT ATTACHED");
         }
+
+        StartCoroutine(UpdateHealthBar());
     }
 
     private void Instance_OnGameEnded()
@@ -112,6 +121,18 @@ public class Enemy : MonoBehaviour
         }
         // Need a gamemanager to check if the enemy is slowed or not.
         // Make slowing enemies an event.
+    }
+    #endregion
+
+    #region Public Functions
+    public void SplashSubscribeToTurret(Projectile projectile)
+    {
+        projectile.SendBackToEnemy += Enemy_OnEnemyHit;
+    }
+
+    public float GetHealth()
+    {
+        return health;
     }
     #endregion
 
@@ -139,11 +160,6 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    void CheckIfSlowed()
-    {
-
-    }
-
     void LoseALife()
     {
         // Player should lose a life because the enemy reached the end of the level.
@@ -155,14 +171,16 @@ public class Enemy : MonoBehaviour
         Destroy(gameObject);
     }
 
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.GetComponent<Projectile>() != null)
         {
             other.GetComponent<Projectile>().SendBackToEnemy += Enemy_OnEnemyHit;
-            Debug.Log("idk whats wrongs");
         }
     }
+
+    
 
     private void Enemy_OnEnemyHit(Turrets turret)
     {
@@ -183,18 +201,30 @@ public class Enemy : MonoBehaviour
 
         if (health <= 0)
         {
-            Die();
+            StartCoroutine(Die());
         }
+
+        StartCoroutine(UpdateHealthBar());
     }
 
-    void Die()
+    IEnumerator Die()
     {
+        yield return new WaitForEndOfFrame();
         GameManager.Instance.OnGameEnded -= Instance_OnGameEnded;
+
         if (JustDied != null)
         {
             JustDied(this);
         }
+
         Destroy(gameObject);
+    }
+
+    IEnumerator UpdateHealthBar()
+    {
+        yield return new WaitForEndOfFrame();
+        float amount = Mathf.Clamp01(health / maxHealth);
+        healthImage.fillAmount = amount;
     }
     #endregion
 }
