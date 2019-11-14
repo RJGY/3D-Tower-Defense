@@ -24,6 +24,8 @@ public class EnemySpawner : MonoBehaviour
     private int[] firstSpawns = { 5, 7, 10, 15 };
     private int[] firstSpawnDelay = { 4, 3, 2, 1 };
     private int[] firstWaveDelay = { 15, 13, 10, 6 };
+    private int[] firstHealthSpawns = { 4, 6, 8, 11 };
+    private float healthToSet;
     #endregion
 
     #region Monobehaviour
@@ -52,11 +54,13 @@ public class EnemySpawner : MonoBehaviour
             Enemy enemy = Instantiate(enemyPrefab, enemySpawnpoint, Quaternion.identity);
             enemy.OnLifeLost += Enemy_OnLifeLost;
             enemy.JustDied += Enemy_JustDied;
+            enemy.SetHealth(healthToSet);
             enemyList.Add(enemy);
             enemiesSpawned++;
             yield return new WaitForSeconds(spawnDelay);
             spawnEnemyCoroutine = StartCoroutine(SpawnEnemy());
         }
+
         else
         {
             if (AllEnemiesKilledInWave != null)
@@ -80,13 +84,15 @@ public class EnemySpawner : MonoBehaviour
         {
             maxEnemies = firstSpawns[(int)difficulty];
             spawnDelay = firstSpawnDelay[(int)difficulty];
-            waveDelay = firstWaveDelay[(int)waveDelay];
+            waveDelay = firstWaveDelay[(int)difficulty];
+            healthToSet = firstHealthSpawns[(int)difficulty];
         }
         else
         {
             maxEnemies = Mathf.RoundToInt(firstSpawns[(int)difficulty] * Mathf.Pow(scaling.GetScaling(), num));
             spawnDelay = firstSpawnDelay[(int)difficulty] / Mathf.Pow(scaling.GetScaling(), num);
             waveDelay = firstWaveDelay[(int)difficulty] / Mathf.Pow(scaling.GetScaling(), num);
+            healthToSet = firstHealthSpawns[(int)difficulty] * Mathf.Pow(scaling.GetScaling(), num);
         }
 
         enemiesSpawned = 0;

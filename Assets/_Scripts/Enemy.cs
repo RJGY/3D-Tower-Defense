@@ -29,7 +29,7 @@ public class Enemy : MonoBehaviour
     private EnemyType enemyType;
     private EnemySpecies enemyArt;
     private GameManager.Difficulty difficulty;
-    private int[] firstHealthSpawns = { 4, 6, 8, 11 };
+    
     private float maxHealth;
     private float health;
     private float moveSpeed;
@@ -67,7 +67,7 @@ public class Enemy : MonoBehaviour
         healthImage = FindObjectOfType<HealthBar>().GetComponent<Image>();
         agent = GetComponent<NavMeshAgent>();
         wayPointParent = FindObjectOfType<WaypointParent>().GetComponent<Transform>();
-
+        
         if (wayPointParent != null)
         {
             points = wayPointParent.GetComponentsInChildren<Transform>();
@@ -94,8 +94,7 @@ public class Enemy : MonoBehaviour
             GameManager.Instance.OnGameEnded += Instance_OnGameEnded;
             // The assigning of movespeed, health and armour/mr goes down here.
             livesWorth = 1; // TEMP, DELETE LATER
-            maxHealth = 10;
-            health = maxHealth;
+            
         }
         else
         {
@@ -126,6 +125,12 @@ public class Enemy : MonoBehaviour
     #endregion
 
     #region Public Functions
+    public void SetHealth(float maxHealth)
+    {
+        this.maxHealth = maxHealth;
+        health = maxHealth;
+    }
+
     public void SplashSubscribeToTurret(Projectile projectile)
     {
         projectile.SendBackToEnemy += Enemy_OnEnemyHit;

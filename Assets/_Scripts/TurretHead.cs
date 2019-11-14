@@ -19,6 +19,6 @@ public class TurretHead : MonoBehaviour
     private void Turret_OnLookAtEnemy(Vector3 enemyDirection)
     {
         transform.rotation = Quaternion.LookRotation(enemyDirection);
-        transform.eulerAngles -= new Vector3(-90, 180, 0);
+        transform.eulerAngles -= new Vector3(-90, 0, 0);
     }
 }
