@@ -63,6 +63,7 @@ public class Enemy : MonoBehaviour
     #region MonoBehavior
     private void Awake()
     {
+        GameManager.Instance.OnDifficultySent += GameManager_Instance_OnDifficultySent;
         healthImage = FindObjectOfType<HealthBar>().GetComponent<Image>();
         agent = GetComponent<NavMeshAgent>();
         wayPointParent = FindObjectOfType<WaypointParent>().GetComponent<Transform>();
@@ -76,6 +77,8 @@ public class Enemy : MonoBehaviour
             Debug.LogError("NO WAYPOINT PARENT ATTACHED");
         }
     }
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -102,10 +105,6 @@ public class Enemy : MonoBehaviour
         StartCoroutine(UpdateHealthBar());
     }
 
-    private void Instance_OnGameEnded()
-    {
-        agentCanMove = false;
-    }
 
     // Update is called once per frame
     void Update()
@@ -181,8 +180,10 @@ public class Enemy : MonoBehaviour
             other.GetComponent<Projectile>().SendBackToEnemy += Enemy_OnEnemyHit;
         }
     }
-
-    
+    private void Instance_OnGameEnded()
+    {
+        agentCanMove = false;
+    }
 
     private void Enemy_OnEnemyHit(Turrets turret)
     {
@@ -207,6 +208,11 @@ public class Enemy : MonoBehaviour
         }
 
         StartCoroutine(UpdateHealthBar());
+    }
+
+    private void GameManager_Instance_OnDifficultySent(GameManager.Difficulty difficulty)
+    {
+        this.difficulty = difficulty;
     }
 
     IEnumerator Die()
