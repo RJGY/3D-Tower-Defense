@@ -28,6 +28,8 @@ public class Enemy : MonoBehaviour
     [Header("Enemy Statistics")]
     private EnemyType enemyType;
     private EnemySpecies enemyArt;
+    private GameManager.Difficulty difficulty;
+    private int[] firstHealthSpawns = { 4, 6, 8, 11 };
     private float maxHealth;
     private float health;
     private float moveSpeed;

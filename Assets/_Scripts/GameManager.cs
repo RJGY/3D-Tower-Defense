@@ -8,6 +8,37 @@ public class GameManager : MonoBehaviour
     public delegate void GameEnded();
     public event GameEnded OnGameEnded;
 
+    public delegate void SendDifficulty(Difficulty difficulty);
+    public event SendDifficulty OnDifficultySent;
+
+    public delegate void OnWave(int num);
+    public event OnWave SendWaveNum;
+
+    #region Variables
+    [Header("Game Variables")]
+    private int lives;
+    private float money;
+    private int currentWave;
+    private Coroutine waveCounter;
+    private EnemySpawner enemySpawner;
+    private Difficulty difficulty;
+
+    [Header("UI Variables")]
+
+    private Text livesText;
+    private Text moneyText;
+
+    public enum Difficulty
+    {
+        Easy,
+        Medium,
+        Hard,
+        Impossible,
+        Undefined
+    }
+
+    #endregion
+
     #region Singleton
     public static GameManager Instance = null;
     private void Awake()
@@ -27,29 +58,34 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    #region Variables
-    [Header("Game Variables")]
-    private int lives;
-    private int money;
-    private int currentWave;
-    private EnemySpawner enemySpawner;
-
-    [Header("UI Variables")]
-    
-    private Text livesText;
-    private Text moneyText;
-
-    #endregion
-
     #region Monobehaviour
     // Start is called before the first frame update
     void Start()
     {
         enemySpawner.OnLifeLostGM += EnemySpawner_OnLifeLostGM;
-        lives = 20;
-        money = 100;
-        livesText.text = lives.ToString();
-        moneyText.text = money.ToString();
+        enemySpawner.AllEnemiesKilledInWave += EnemySpawner_OnEnemiesKilled;
+
+        lives = 20; // TEMP
+        money = 100; // TEMP
+        difficulty = Difficulty.Medium; // TEMP
+        currentWave = 0;
+
+        UpdateLives();
+        UpdateMoney();
+
+        StartCoroutine(SendDifficultyCoroutine());
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            EnemySpawner_OnEnemiesKilled(2f);
+            Debug.Log("HowManyTimes");
+        }
+    }
+    private void EnemySpawner_OnEnemiesKilled(float waveDelay)
+    {
+        waveCounter = StartCoroutine(WaveCounter(waveDelay));
     }
 
     #endregion
@@ -59,6 +95,7 @@ public class GameManager : MonoBehaviour
     {
         this.lives -= lives;
         UpdateLives();
+
         if (this.lives <= 0)
         {
             GameOver();
@@ -72,21 +109,49 @@ public class GameManager : MonoBehaviour
             OnGameEnded();
         }
     }
+
+    private void AddGold(float gold)
+    {
+        money += gold;
+        UpdateMoney();
+    }
+
     private void UpdateLives()
     {
-        livesText.text = lives.ToString();
+        livesText.text = "Lives: " + lives.ToString();
     }
 
     private void UpdateMoney()
     {
-        moneyText.text = money.ToString();
+        moneyText.text = "Money: " + money.ToString();
     }
     #endregion
 
     #region Coroutines
-    IEnumerator WaveCounter()
+    IEnumerator SendDifficultyCoroutine()
     {
-        yield return new WaitForSeconds(0);
+        yield return new WaitForEndOfFrame();
+        if (OnDifficultySent != null && difficulty != Difficulty.Undefined)
+        {
+            OnDifficultySent(difficulty);
+        }
+        else
+        {
+            Debug.Log("Noone is taking the difficulty or difficulty is Undefined.");
+        }
+    }
+    IEnumerator WaveCounter(float waveDelay)
+    {
+        yield return new WaitForSeconds(waveDelay);
+        currentWave++;
+        if (SendWaveNum != null)
+        {
+            SendWaveNum(currentWave);
+        }
+        else
+        {
+            Debug.Log("Noone is taking the wave number");
+        }
     }
     #endregion
 }

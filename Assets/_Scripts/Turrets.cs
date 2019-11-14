@@ -140,8 +140,10 @@ public class Turrets : MonoBehaviour
         Enemy strongestEnemy = null;
         foreach (Enemy enemy in enemySpawner.enemyList)
         {
+            // Enemy out of attack range
             if (Vector3.Distance(enemy.transform.position, transform.position) > attackRange)
             {
+                // Dont bother with targeting it.
                 continue;
             }
 
