@@ -8,12 +8,27 @@ public class Shop : MonoBehaviour
     {
         CloseShop();
     }
-    public void PurchaseStandardTurret()
+    public void PurchaseArcherTurret()
+    {
+        
+    }
+
+    public void PurchaseBombTurret()
     {
 
     }
 
-    public void PurchaseAnotherTurret()
+    public void PurchaseMagicTower()
+    {
+
+    }
+
+    public void PurchaseIceTower()
+    {
+
+    }
+
+    public void PurchaseTower()
     {
 
     }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class BuildManager : MonoBehaviour
 {
     private Turrets turretToBuild;
-    public Turrets standardTurretPrefab;
+    public Turrets[] turrets;
 
     #region Singleton
     public static BuildManager Instance = null;
@@ -24,11 +24,16 @@ public class BuildManager : MonoBehaviour
 
     private void Start()
     {
-        turretToBuild = standardTurretPrefab;
+        turretToBuild = turrets[0];
     }
 
     public Turrets GetTurretToBuild()
     {
         return turretToBuild;
+    }
+
+    public void SetTurretToBuild(Turrets turretToBuild)
+    {
+        this.turretToBuild = turretToBuild;
     }
 }
