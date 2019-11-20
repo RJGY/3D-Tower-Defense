@@ -14,24 +14,24 @@ public class Turrets : MonoBehaviour
     public event LookAtEnemy OnLookAtEnemy;
 
     [Header("Turret Variables")]
-    private float attackRange;
-    private float attackSpeed; // Measured in attacks per second.
-    private float attackDamage;
-    private float magicDamage;
-    private float pureDamage;
-    private float armourPenetration;
-    private float magicResistPenetration;
-    private float splashRange;
-    private float slowAmount;
-    private float projectileSpeed;
-    private bool turretCanAttack;
-    private float sellValue;
-    private TurretHead turretHead;
-    private EnemySpawner enemySpawner;
-    private TurretType turretType;
-    private AttackType attackType;
+    protected float attackRange;
+    protected float attackSpeed; // Measured in attacks per second.
+    protected float attackDamage;
+    protected float magicDamage;
+    protected float pureDamage;
+    protected float armourPenetration;
+    protected float magicResistPenetration;
+    protected float splashRange;
+    protected float slowAmount;
+    protected float projectileSpeed;
+    protected bool turretCanAttack;
+    protected float sellValue;
+    protected TurretHead turretHead;
+    protected EnemySpawner enemySpawner;
+    protected TurretType turretType;
+    protected AttackType attackType;
     [SerializeField]
-    private Projectile projectilePrefab;
+    protected Projectile projectilePrefab;
 
 
     public enum TurretType
@@ -55,35 +55,7 @@ public class Turrets : MonoBehaviour
         Strongest
     }
 
-    private void Awake()
-    {
-        enemySpawner = FindObjectOfType<EnemySpawner>();
-        turretHead = GetComponentInChildren<TurretHead>();
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        turretType = TurretType.Archer;
-        pureDamage = 2.5f; // TEMP, DELETE LATER
-        attackRange = 10;
-        attackSpeed = 1;
-        attackType = AttackType.Last;
-        splashRange = 10;
-        projectileSpeed = 30;
-        turretCanAttack = true;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (EnemyInRange())
-        {
-            Attack();
-        }
-    }
-
-    bool EnemyInRange()
+    protected bool EnemyInRange()
     {
         bool inRange = false;
         foreach (Enemy enemy in enemySpawner.enemyList)
@@ -97,7 +69,7 @@ public class Turrets : MonoBehaviour
         return inRange;
     }
 
-    Transform TargetClosest()
+    protected Transform TargetClosest()
     {
         Transform closestEnemy = null;
         foreach (Enemy enemy in enemySpawner.enemyList)
@@ -119,7 +91,7 @@ public class Turrets : MonoBehaviour
         return closestEnemy;
     }
 
-    Transform TargetFirst()
+    protected Transform TargetFirst()
     {
         Transform firstEnemy = null;
         foreach (Enemy enemy in enemySpawner.enemyList)
@@ -135,7 +107,7 @@ public class Turrets : MonoBehaviour
         return firstEnemy;
     }
 
-    Transform TargetStrongest()
+    protected Transform TargetStrongest()
     {
         Enemy strongestEnemy = null;
         foreach (Enemy enemy in enemySpawner.enemyList)
@@ -164,7 +136,7 @@ public class Turrets : MonoBehaviour
         return strongestEnemy.transform;
     }
 
-    Transform TargetLast()
+    protected Transform TargetLast()
     {
         Transform lastEnemy = null;
         foreach (Enemy enemy in enemySpawner.enemyList)
@@ -179,7 +151,7 @@ public class Turrets : MonoBehaviour
         return lastEnemy;
     }
 
-    void Attack()
+    protected void Attack()
     {
         Transform targetedEnemy;
         Vector3 targetPosition;
@@ -237,7 +209,7 @@ public class Turrets : MonoBehaviour
         }
     }
 
-    private void Projectile_OnDamageDealt(Projectile projectile)
+    protected void Projectile_OnDamageDealt(Projectile projectile)
     {
         if (OnTookDamage != null)
         { 
@@ -251,7 +223,7 @@ public class Turrets : MonoBehaviour
         projectile.OnEnemyHit -= Projectile_OnDamageDealt;
     }
 
-    private void Projectile_OnSplashDamageDealt(Projectile projectile)
+    protected void Projectile_OnSplashDamageDealt(Projectile projectile)
     {
         if (OnTookDamage != null)
         {
@@ -265,7 +237,7 @@ public class Turrets : MonoBehaviour
         projectile.OnEnemyHit -= Projectile_OnSplashDamageDealt;
     }
 
-    IEnumerator AttackCooldown()
+    protected IEnumerator AttackCooldown()
     {
         yield return new WaitForSeconds(1 / attackSpeed);
         turretCanAttack = true;

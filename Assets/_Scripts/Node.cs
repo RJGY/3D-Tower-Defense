@@ -9,7 +9,7 @@ public class Node : MonoBehaviour
     private Renderer rend;
     private Turrets turret;
     private Vector3 offset;
-
+    private bool selected;
     private void Awake()
     {
         rend = GetComponentInChildren<Renderer>();
@@ -29,17 +29,22 @@ public class Node : MonoBehaviour
 
     private void OnMouseDown()
     {
+        selected = true;
         if (turret != null)
         {
             Debug.Log("YOU CANT BUILD A TURRET, THERES A TURRET HERE ALREADY");
             return;
         }
-        
+
+        // TODO - OPEN THE SHOP
         turret = Instantiate(BuildManager.Instance.GetTurretToBuild(), transform.position + offset, transform.rotation, transform);
     }
 
     private void OnMouseExit()
     {
-        rend.material.color = defaultColor;
+        if (!selected)
+        {
+            rend.material.color = defaultColor;
+        }
     }
 }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 170076734}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -894,7 +894,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -384, y: 220}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &820700560
@@ -1073,7 +1073,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca24bee1579a8ee4aa43048ec94674c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  standardTurretPrefab: {fileID: 2819998666439838452, guid: 39e5af0a969b8234994bdc3ebedc2a66,
+  standardTurretPrefab: {fileID: 134298846848707391, guid: 39e5af0a969b8234994bdc3ebedc2a66,
     type: 3}
 --- !u!1 &1158349014
 GameObject:
@@ -1559,7 +1559,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Button
+  m_Text: FIRST TURRET
 --- !u!222 &1286999393
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1603,7 +1603,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -30.7}
+  m_AnchoredPosition: {x: -384, y: 189.3}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1313231208
@@ -1923,6 +1923,7 @@ GameObject:
   - component: {fileID: 2047085413}
   - component: {fileID: 2047085412}
   - component: {fileID: 2047085411}
+  - component: {fileID: 2047085414}
   m_Layer: 5
   m_Name: Shop
   m_TagString: Untagged
@@ -1947,8 +1948,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 194.055, y: 0}
-  m_SizeDelta: {x: -388.11, y: 344}
+  m_AnchoredPosition: {x: 270.4, y: 0}
+  m_SizeDelta: {x: -540.8, y: 537}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2047085411
 MonoBehaviour:
@@ -2010,6 +2011,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2047085409}
   m_CullTransparentMesh: 0
+--- !u!114 &2047085414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2047085409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec5c0d48b1c3b614d9d3c8d5011aa453, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2061402629
 GameObject:
   m_ObjectHideFlags: 0
