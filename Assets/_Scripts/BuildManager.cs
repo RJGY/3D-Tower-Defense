@@ -32,8 +32,17 @@ public class BuildManager : MonoBehaviour
         return turretToBuild;
     }
 
-    public void SetTurretToBuild(Turrets turretToBuild)
+    public void SetTurretToBuild(Turrets.TurretType turretType)
     {
-        this.turretToBuild = turretToBuild;
+        foreach (Turrets turret in turrets)
+        {
+            if (turretType == turret.GetTurretType())
+            {
+                turretToBuild = turret;
+                return;
+            }
+        }
+        Debug.LogError("GONE WRONG");
+        
     }
 }

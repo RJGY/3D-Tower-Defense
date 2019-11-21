@@ -6,6 +6,7 @@ public class Node : MonoBehaviour
 {
     public Color hoverColor;
     public Color defaultColor;
+    public Color occupiedColor;
     private Renderer rend;
     private Turrets turret;
     private Vector3 offset;
@@ -24,7 +25,10 @@ public class Node : MonoBehaviour
 
     private void OnMouseEnter()
     {
-        rend.material.color = hoverColor;
+        if (turret == null)
+        {
+            rend.material.color = hoverColor;
+        }
     }
 
     private void OnMouseDown()
@@ -37,14 +41,31 @@ public class Node : MonoBehaviour
         }
 
         // TODO - OPEN THE SHOP
-        turret = Instantiate(BuildManager.Instance.GetTurretToBuild(), transform.position + offset, transform.rotation, transform);
+        Shop.Instance.OpenShop(this);
+        Shop.Instance.OnPurchase += BuildTurret;
+        Shop.Instance.StoppedPurchase += BuildManager_Instance_StoppedPurchase;
     }
 
-    private void OnMouseExit()
+    private void BuildManager_Instance_StoppedPurchase()
     {
-        if (!selected)
+        Shop.Instance.OnPurchase -= BuildTurret;
+        Shop.Instance.StoppedPurchase -= BuildManager_Instance_StoppedPurchase;
+        selected = false;
+        rend.material.color = defaultColor;
+    }
+
+    private void BuildTurret()
+    {
+        Shop.Instance.OnPurchase -= BuildTurret;
+        Shop.Instance.StoppedPurchase -= BuildManager_Instance_StoppedPurchase;
+        if (turret == null)
         {
-            rend.material.color = defaultColor;
+            turret = Instantiate(BuildManager.Instance.GetTurretToBuild(), transform.position + offset, transform.rotation, transform);
+            rend.material.color = occupiedColor;
+        }
+        else
+        {
+            Debug.LogError("YOU CANT BUILD A TURRET, THERES A TURRET HERE ALREADY");
         }
     }
 }

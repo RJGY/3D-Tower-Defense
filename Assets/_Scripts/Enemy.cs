@@ -145,8 +145,10 @@ public class Enemy : MonoBehaviour
     #region Functions
     void GoToEnd()
     {
+        // If there are no points in the array.
         if (points.Length < 1)
         {
+            // Send error to console and get out.
             Debug.LogError("No waypoints assigned.");
             return;
         }
@@ -171,6 +173,7 @@ public class Enemy : MonoBehaviour
         // Player should lose a life because the enemy reached the end of the level.
         if (OnLifeLost != null)
         {
+            // 
             GameManager.Instance.OnGameEnded -= Instance_OnGameEnded;
             OnLifeLost(livesWorth, this);
         }

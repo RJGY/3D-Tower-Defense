@@ -151,7 +151,7 @@ public class Turrets : MonoBehaviour
         return lastEnemy;
     }
 
-    protected void Attack()
+    virtual protected void Attack()
     {
         Transform targetedEnemy;
         Vector3 targetPosition;
@@ -241,5 +241,10 @@ public class Turrets : MonoBehaviour
     {
         yield return new WaitForSeconds(1 / attackSpeed);
         turretCanAttack = true;
+    }
+
+    public TurretType GetTurretType()
+    {
+        return turretType;
     }
 }
