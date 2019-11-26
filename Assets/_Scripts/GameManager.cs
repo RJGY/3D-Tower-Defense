@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     public event OnWave SendWaveNum;
 
     #region Variables
+
     [Header("Game Variables")]
     private int lives;
     private float money;
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour
 
     private Text livesText;
     private Text moneyText;
+    private Text waveText;
 
     public enum Difficulty
     {
@@ -125,6 +127,11 @@ public class GameManager : MonoBehaviour
     {
         moneyText.text = "Money: " + money.ToString();
     }
+
+    private void UpdateWave()
+    {
+        waveText.text = "Wave: " + currentWave.ToString();
+    }
     #endregion
 
     #region Coroutines
@@ -152,6 +159,7 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("Noone is taking the wave number");
         }
+        UpdateWave();
     }
     #endregion
 }

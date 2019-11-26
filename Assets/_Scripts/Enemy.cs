@@ -11,9 +11,10 @@ public class Enemy : MonoBehaviour
     public event LostALife OnLifeLost;
     public delegate void EnemyKilled(Enemy enemy);
     public event EnemyKilled JustDied;
+    /*
     public delegate void SendHealth(float health);
     public event SendHealth OnHealthSent;
-
+    */
     [Header("NavMeshAgent Properties")]
     private NavMeshAgent agent;
     private Transform wayPointParent;
