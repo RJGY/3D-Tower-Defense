@@ -30,6 +30,7 @@ public class Turrets : MonoBehaviour
     protected EnemySpawner enemySpawner;
     protected TurretType turretType;
     protected AttackType attackType;
+    protected float worth;
     [SerializeField]
     protected Projectile projectilePrefab;
 
@@ -248,4 +249,11 @@ public class Turrets : MonoBehaviour
     {
         return turretType;
     }
+
+    public virtual float GetTurretCost()
+    {
+        return worth;
+    }
+
+    
 }

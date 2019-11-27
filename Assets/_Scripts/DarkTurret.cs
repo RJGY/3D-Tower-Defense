@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CrossBowTurret : Turrets
+public class DarkTurret : Turrets
 {
+    // THIS DUDE NEEDS NEW ATTACK FUNCTION
     // BASE STATS
     protected new float worth = 100;
-    protected new float attackDamage = 10;
+    protected new float attackDamage = 0;
     protected new float magicDamage = 0;
     protected new float pureDamage = 0;
     protected new float armourPenetration = 100;

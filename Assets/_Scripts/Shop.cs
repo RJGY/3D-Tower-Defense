@@ -1,15 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 public class Shop : MonoBehaviour
 {
     public delegate void PurchaseTurret();
+    public delegate void PayForTurret(float cost);
+    public event PayForTurret OnPay;
     public event PurchaseTurret OnPurchase;
     public event PurchaseTurret StoppedPurchase;
+
+    private float snapshotOfMoney;
     private Node currentNode;
     public Button purchaseButton;
     private Vector2 screen;
+
     #region Singleton
     public static Shop Instance = null;
     private void Awake()
@@ -24,6 +27,7 @@ public class Shop : MonoBehaviour
         }
     }
     #endregion
+
     private void Start()
     {
         CloseShop();
@@ -31,29 +35,34 @@ public class Shop : MonoBehaviour
         screen.y = Screen.height / 9;
     }
 
+    #region Functions
+
     public void SelectTower(int turretType)
     {
         BuildManager.Instance.SetTurretToBuild((Turrets.TurretType)turretType);
-        purchaseButton.gameObject.SetActive(true);
+        ShowButton(true);
     }
 
     public void PurchaseTower()
     {
-        // if money grater than cost of tower, buy the tower
-        if ()
+        if (GameManager.Instance.GetGold() >= BuildManager.Instance.GetTurretPrice())
         {
-
+            if (OnPurchase != null)
+            {
+                OnPurchase();
+                OnPay(BuildManager.Instance.GetTurretPrice());
+                Debug.Log("Turret Purchased");
+            }
+            else
+            {
+                Debug.Log("No node subscribed to OnPurchased");
+            }
+            CloseShop();
         }
         else
         {
-            return;
+            Debug.Log("You do not have enough money to buy the turret");
         }
-        if (OnPurchase != null)
-        {
-            OnPurchase();
-            Debug.Log("Turret Purchased");
-        }
-        CloseShop();
     }
     public void OpenShop(Node node)
     {
@@ -74,7 +83,7 @@ public class Shop : MonoBehaviour
             }
             currentNode = node;
         }
-        purchaseButton.gameObject.SetActive(false);
+        ShowButton(false);
     }
 
     public void CloseShop()
@@ -88,7 +97,22 @@ public class Shop : MonoBehaviour
             Debug.Log("STOPPED PURCHASE");
         }
         currentNode = null;
-        purchaseButton.gameObject.SetActive(false);
+        ShowButton(false);
         gameObject.SetActive(false);
     }
+
+    public void ShowButton(bool show)
+    {
+        if (show)
+        {
+            purchaseButton.gameObject.SetActive(true);
+            purchaseButton.GetComponentInChildren<Text>().text = "Purchase: " + BuildManager.Instance.GetTurretPrice().ToString();
+        }
+        else
+        {
+            purchaseButton.gameObject.SetActive(false);
+        }
+    }
+    #endregion
+
 }

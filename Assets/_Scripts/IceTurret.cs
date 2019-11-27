@@ -4,28 +4,30 @@ using UnityEngine;
 
 public class IceTurret : Turrets
 {
+    // THIS DUDE NEEDS NEW ATTACK FUNCTION
+    // BASE STATS
+    protected new float worth = 50;
+    protected new float attackDamage = 0;
+    protected new float magicDamage = 0;
+    protected new float pureDamage = 0;
+    protected new float armourPenetration = 100;
+    protected new float magicResistPenetration = 0;
+    protected new float splashRange = 3;
+    protected new float attackRange = 15;
+    protected new float attackSpeed = 1;
+    protected new float projectileSpeed = 80;
+
     private void Awake()
     {
         enemySpawner = FindObjectOfType<EnemySpawner>();
         turretHead = GetComponentInChildren<TurretHead>();
     }
+
     // Start is called before the first frame update
     void Start()
     {
-        // BASE STATS
-        // TODO LOAD PREFAB OF RESEOURCES Ice Particle
-        turretType = TurretType.Archer;
-        attackDamage = 1;
-        magicDamage = 0;
-        pureDamage = 0;
-        armourPenetration = 50;
-        magicResistPenetration = 0;
-        splashRange = 10;
-        attackRange = 10;
-        attackSpeed = 1;
-        projectileSpeed = 30;
+        // TODO LOAD PREFAB OF RESEOURCES ARROW
         attackType = AttackType.First;
-
         turretCanAttack = true;
     }
 
@@ -36,6 +38,16 @@ public class IceTurret : Turrets
         {
             Attack();
         }
+    }
+
+    public override TurretType GetTurretType()
+    {
+        return TurretType.Crossbow;
+    }
+
+    public override float GetTurretCost()
+    {
+        return worth;
     }
 
     override protected void Attack()

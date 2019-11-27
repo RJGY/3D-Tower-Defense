@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    #region Events
     public delegate void GameEnded();
     public event GameEnded OnGameEnded;
 
@@ -13,6 +14,8 @@ public class GameManager : MonoBehaviour
 
     public delegate void OnWave(int num);
     public event OnWave SendWaveNum;
+    #endregion
+
     #region Variables
 
     [Header("Game Variables")]
@@ -69,7 +72,7 @@ public class GameManager : MonoBehaviour
     {
         enemySpawner.OnLifeLostGM += EnemySpawner_OnLifeLostGM;
         enemySpawner.AllEnemiesKilledInWave += EnemySpawner_OnEnemiesKilled;
-        
+        shop.OnPay += Shop_OnPurchase;
 
         lives = 20; // TEMP
         money = 100; // TEMP
@@ -83,6 +86,7 @@ public class GameManager : MonoBehaviour
 
         StartCoroutine(SendDifficultyCoroutine());
     }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.W))
@@ -90,14 +94,20 @@ public class GameManager : MonoBehaviour
             EnemySpawner_OnEnemiesKilled(2f);
         }
     }
+
+    #endregion
+
+    #region Functions
     private void EnemySpawner_OnEnemiesKilled(float waveDelay)
     {
         waveCounter = StartCoroutine(WaveCounter(waveDelay));
     }
 
-    #endregion
+    private void Shop_OnPurchase(float cost)
+    {
+        money -= cost;
+    }
 
-    #region Functions
     private void EnemySpawner_OnLifeLostGM(int lives)
     {
         this.lives -= lives;
@@ -121,6 +131,11 @@ public class GameManager : MonoBehaviour
     {
         money += gold;
         UpdateMoney();
+    }
+
+    public float GetGold()
+    {
+        return money;
     }
 
     private void UpdateLives()

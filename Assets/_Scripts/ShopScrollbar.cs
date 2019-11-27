@@ -31,11 +31,11 @@ public class ShopScrollbar : MonoBehaviour
 
     void UpdateScrollBarSize()
     {
-        scrollbar.size = 400f / size;
+        scrollbar.size = Screen.height / size;
     }
 
     void UpdateScrollValue(float value)
     {
-        scrollBuffer.transform.localPosition = new Vector3(0, value * (size - 400f), 0);
+        scrollBuffer.transform.localPosition = new Vector3(0, value * (size - Screen.height), 0);
     }
 }

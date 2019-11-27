@@ -32,6 +32,11 @@ public class BuildManager : MonoBehaviour
         return turretToBuild;
     }
 
+    public float GetTurretPrice()
+    {
+        return turretToBuild.GetTurretCost();
+    }
+
     public void SetTurretToBuild(Turrets.TurretType turretType)
     {
         foreach (Turrets turret in turrets)
