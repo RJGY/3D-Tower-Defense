@@ -44,6 +44,7 @@ public class Turrets : MonoBehaviour
         Hellfire,
         Buff,
         Debuff,
+        Dark,
         Undefined
     }
 
@@ -243,7 +244,7 @@ public class Turrets : MonoBehaviour
         turretCanAttack = true;
     }
 
-    public TurretType GetTurretType()
+    public virtual TurretType GetTurretType()
     {
         return turretType;
     }

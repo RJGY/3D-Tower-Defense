@@ -15,7 +15,7 @@ public class ArcherTurret : Turrets
     {
         // BASE STATS
         // TODO LOAD PREFAB OF RESEOURCES ARROW
-        turretType = TurretType.Archer;
+        
         attackDamage = 5;
         magicDamage = 0;
         pureDamage = 0;
@@ -37,5 +37,10 @@ public class ArcherTurret : Turrets
         {
             Attack();
         }
+    }
+
+    public override TurretType GetTurretType()
+    {
+        return TurretType.Archer;
     }
 }

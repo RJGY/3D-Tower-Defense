@@ -43,6 +43,5 @@ public class BuildManager : MonoBehaviour
             }
         }
         Debug.LogError("GONE WRONG");
-        
     }
 }

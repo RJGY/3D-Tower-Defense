@@ -31,6 +31,14 @@ public class Node : MonoBehaviour
         }
     }
 
+    private void OnMouseExit()
+    {
+        if (turret == null && !selected)
+        {
+            rend.material.color = defaultColor;
+        }
+    }
+
     private void OnMouseDown()
     {
         selected = true;

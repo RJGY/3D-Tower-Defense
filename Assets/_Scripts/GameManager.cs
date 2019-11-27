@@ -13,16 +13,17 @@ public class GameManager : MonoBehaviour
 
     public delegate void OnWave(int num);
     public event OnWave SendWaveNum;
-
     #region Variables
 
     [Header("Game Variables")]
     private int lives;
     private float money;
     private int currentWave;
+    private int maxWaves;
     private Coroutine waveCounter;
     private EnemySpawner enemySpawner;
     private Difficulty difficulty;
+    private Shop shop;
 
     [Header("UI Variables")]
 
@@ -54,8 +55,10 @@ public class GameManager : MonoBehaviour
             Debug.LogError("Multiple GameManagers in scene.");
         }
 
+        shop = FindObjectOfType<Shop>();
         livesText = FindObjectOfType<LivesText>().GetComponent<Text>();
         moneyText = FindObjectOfType<MoneyText>().GetComponent<Text>();
+        waveText = FindObjectOfType<WaveText>().GetComponent<Text>();
         enemySpawner = FindObjectOfType<EnemySpawner>();
     }
     #endregion
@@ -66,14 +69,17 @@ public class GameManager : MonoBehaviour
     {
         enemySpawner.OnLifeLostGM += EnemySpawner_OnLifeLostGM;
         enemySpawner.AllEnemiesKilledInWave += EnemySpawner_OnEnemiesKilled;
+        
 
         lives = 20; // TEMP
         money = 100; // TEMP
         difficulty = Difficulty.Medium; // TEMP
         currentWave = 0;
+        maxWaves = 50;
 
         UpdateLives();
         UpdateMoney();
+        UpdateWave();
 
         StartCoroutine(SendDifficultyCoroutine());
     }
@@ -82,7 +88,6 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.W))
         {
             EnemySpawner_OnEnemiesKilled(2f);
-            Debug.Log("HowManyTimes");
         }
     }
     private void EnemySpawner_OnEnemiesKilled(float waveDelay)
@@ -130,7 +135,7 @@ public class GameManager : MonoBehaviour
 
     private void UpdateWave()
     {
-        waveText.text = "Wave: " + currentWave.ToString();
+        waveText.text = "Wave: " + currentWave.ToString() + " / " + maxWaves;
     }
     #endregion
 
@@ -149,8 +154,9 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator WaveCounter(float waveDelay)
     {
-        yield return new WaitForSeconds(waveDelay);
         currentWave++;
+        UpdateWave();
+        yield return new WaitForSeconds(waveDelay);
         if (SendWaveNum != null)
         {
             SendWaveNum(currentWave);
@@ -159,7 +165,6 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("Noone is taking the wave number");
         }
-        UpdateWave();
     }
     #endregion
 }
