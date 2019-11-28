@@ -4,17 +4,7 @@ using UnityEngine;
 
 public class ArcherTurret : Turrets
 {
-    // BASE STATS
-    protected new float worth = 50;
-    protected new float attackDamage = 8;
-    protected new float magicDamage = 0;
-    protected new float pureDamage = 0;
-    protected new float armourPenetration = 50;
-    protected new float magicResistPenetration = 0;
-    protected new float splashRange = -1;
-    protected new float attackRange = 12;
-    protected new float attackSpeed = 2;
-    protected new float projectileSpeed = 40;
+    public new float Worth = 50;
 
     private void Awake()
     {
@@ -23,12 +13,22 @@ public class ArcherTurret : Turrets
     }
 
     // Start is called before the first frame update
-    void Start() 
+    void Start()
     {
         // TODO LOAD PREFAB OF RESEOURCES ARROW
-        
         attackType = AttackType.First;
         turretCanAttack = true;
+
+        // BASE STATS
+        attackDamage = 8;
+        magicDamage = 0;
+        pureDamage = 0;
+        armourPenetration = 50;
+        magicResistPenetration = 0;
+        splashRange = -1;
+        attackRange = 12;
+        attackSpeed = 2;
+        projectileSpeed = 30;
     }
 
     // Update is called once per frame
@@ -40,14 +40,24 @@ public class ArcherTurret : Turrets
         }
     }
 
+    protected override void Attack()
+    {
+        base.Attack();
+    }
+
+    protected override bool EnemyInRange()
+    {
+        return base.EnemyInRange();
+    }
+
     public override TurretType GetTurretType()
     {
         return TurretType.Archer;
     }
-    
+
     public override float GetTurretCost()
     {
-        return worth;
+        return Worth;
     }
-    
+
 }

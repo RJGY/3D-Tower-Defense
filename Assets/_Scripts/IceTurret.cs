@@ -4,18 +4,7 @@ using UnityEngine;
 
 public class IceTurret : Turrets
 {
-    // THIS DUDE NEEDS NEW ATTACK FUNCTION
-    // BASE STATS
-    protected new float worth = 50;
-    protected new float attackDamage = 0;
-    protected new float magicDamage = 0;
-    protected new float pureDamage = 0;
-    protected new float armourPenetration = 100;
-    protected new float magicResistPenetration = 0;
-    protected new float splashRange = 3;
-    protected new float attackRange = 15;
-    protected new float attackSpeed = 1;
-    protected new float projectileSpeed = 80;
+    public new float Worth = 80;
 
     private void Awake()
     {
@@ -29,6 +18,17 @@ public class IceTurret : Turrets
         // TODO LOAD PREFAB OF RESEOURCES ARROW
         attackType = AttackType.First;
         turretCanAttack = true;
+
+        // BASE STATS
+        attackDamage = 0;
+        magicDamage = 5;
+        pureDamage = 2;
+        armourPenetration = 0;
+        magicResistPenetration = 80;
+        splashRange = 2;
+        attackRange = 12;
+        attackSpeed = 1.2f;
+        projectileSpeed = 15;
     }
 
     // Update is called once per frame
@@ -42,12 +42,12 @@ public class IceTurret : Turrets
 
     public override TurretType GetTurretType()
     {
-        return TurretType.Crossbow;
+        return TurretType.Ice;
     }
 
     public override float GetTurretCost()
     {
-        return worth;
+        return Worth;
     }
 
     override protected void Attack()

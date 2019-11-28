@@ -44,7 +44,9 @@ public class Node : MonoBehaviour
         selected = true;
         if (turret != null)
         {
-            Debug.Log("YOU CANT BUILD A TURRET, THERES A TURRET HERE ALREADY");
+            // OPEN UPGRADE MANAGER
+            UpgradeManager.Instance.OpenUpgrade(turret);
+            // NEED EVENTS
             return;
         }
 
@@ -69,6 +71,7 @@ public class Node : MonoBehaviour
         if (turret == null)
         {
             turret = Instantiate(BuildManager.Instance.GetTurretToBuild(), transform.position + offset, transform.rotation, transform);
+            turret.name = BuildManager.Instance.GetTurretToBuild().ToString();
             rend.material.color = occupiedColor;
         }
         else

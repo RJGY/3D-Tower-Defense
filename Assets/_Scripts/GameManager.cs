@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     private EnemySpawner enemySpawner;
     private Difficulty difficulty;
     private Shop shop;
+    private UpgradeManager upgrade;
 
     [Header("UI Variables")]
 
@@ -63,6 +64,7 @@ public class GameManager : MonoBehaviour
         moneyText = FindObjectOfType<MoneyText>().GetComponent<Text>();
         waveText = FindObjectOfType<WaveText>().GetComponent<Text>();
         enemySpawner = FindObjectOfType<EnemySpawner>();
+        upgrade = FindObjectOfType<UpgradeManager>();
     }
     #endregion
 
@@ -73,6 +75,7 @@ public class GameManager : MonoBehaviour
         enemySpawner.OnLifeLostGM += EnemySpawner_OnLifeLostGM;
         enemySpawner.AllEnemiesKilledInWave += EnemySpawner_OnEnemiesKilled;
         shop.OnPay += Shop_OnPurchase;
+        upgrade.OnPay += Upgrade_OnPay;
 
         lives = 20; // TEMP
         money = 100; // TEMP
@@ -86,6 +89,8 @@ public class GameManager : MonoBehaviour
 
         StartCoroutine(SendDifficultyCoroutine());
     }
+
+
 
     private void Update()
     {
@@ -104,6 +109,12 @@ public class GameManager : MonoBehaviour
     }
 
     private void Shop_OnPurchase(float cost)
+    {
+        money -= cost;
+        UpdateMoney();
+    }
+
+    private void Upgrade_OnPay(float cost)
     {
         money -= cost;
         UpdateMoney();

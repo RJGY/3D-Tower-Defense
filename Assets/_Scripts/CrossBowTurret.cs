@@ -5,16 +5,7 @@ using UnityEngine;
 public class CrossBowTurret : Turrets
 {
     // BASE STATS
-    protected new float worth = 100;
-    protected new float attackDamage = 10;
-    protected new float magicDamage = 0;
-    protected new float pureDamage = 0;
-    protected new float armourPenetration = 100;
-    protected new float magicResistPenetration = 0;
-    protected new float splashRange = -1;
-    protected new float attackRange = 15;
-    protected new float attackSpeed = 1;
-    protected new float projectileSpeed = 80;
+    public new float Worth = 80;
 
     private void Awake()
     {
@@ -28,6 +19,17 @@ public class CrossBowTurret : Turrets
         // TODO LOAD PREFAB OF RESEOURCES ARROW
         attackType = AttackType.First;
         turretCanAttack = true;
+
+        // BASE STATS
+        attackDamage = 30;
+        magicDamage = 0;
+        pureDamage = 0;
+        armourPenetration = 1000;
+        magicResistPenetration = 0;
+        splashRange = -1;
+        attackRange = 10;
+        attackSpeed = 0.5f;
+        projectileSpeed = 15;
     }
 
     // Update is called once per frame
@@ -46,6 +48,6 @@ public class CrossBowTurret : Turrets
 
     public override float GetTurretCost()
     {
-        return worth;
+        return Worth;
     }
 }

@@ -7,7 +7,7 @@ public class BuffTurret : Turrets
     // THIS DUDE NEEDS NEW ATTACK FUNCTION
     // THis dude doesnt need a projectile
     // BASE STATS
-    protected new float worth = 500;
+    public new float Worth = 500000000;
     protected new float attackDamage = 1.5f;
     protected new float magicDamage = 0;
     protected new float pureDamage = 0;
@@ -33,7 +33,7 @@ public class BuffTurret : Turrets
         // TODO LOAD PREFAB OF RESEOURCES ARROW
         attackType = AttackType.First;
         turretCanAttack = true;
-        
+
     }
 
     // Update is called once per frame
@@ -47,6 +47,7 @@ public class BuffTurret : Turrets
 
     protected override void Attack()
     {
+        Debug.Log("AM I CALLING THIS FUNCTION BUFF TOWER");
         foreach (Turrets turret in turrets)
         {
             if (Vector3.Distance(turret.transform.position, transform.position) < attackRange)
@@ -91,6 +92,6 @@ public class BuffTurret : Turrets
 
     public override float GetTurretCost()
     {
-        return worth;
+        return Worth;
     }
 }

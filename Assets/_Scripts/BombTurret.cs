@@ -4,17 +4,7 @@ using UnityEngine;
 
 public class BombTurret : Turrets
 {
-    // BASE STATS
-    protected new float worth = 80;
-    protected new float attackDamage = 5;
-    protected new float magicDamage = 2;
-    protected new float pureDamage = 0;
-    protected new float armourPenetration = 70;
-    protected new float magicResistPenetration = 20;
-    protected new float splashRange = 3;
-    protected new float attackRange = 9;
-    protected new float attackSpeed = 0.8f;
-    protected new float projectileSpeed = 20;
+    public new float Worth = 80;
 
     private void Awake()
     {
@@ -26,9 +16,19 @@ public class BombTurret : Turrets
     void Start()
     {
         // TODO LOAD PREFAB OF RESEOURCES ARROW
-
         attackType = AttackType.First;
         turretCanAttack = true;
+
+        // BASE STATS
+        attackDamage = 12;
+        magicDamage = 0;
+        pureDamage = 0;
+        armourPenetration = 100;
+        magicResistPenetration = 20;
+        splashRange = 5;
+        attackRange = 10;
+        attackSpeed = 0.8f;
+        projectileSpeed = 15;
     }
 
     // Update is called once per frame
@@ -47,7 +47,7 @@ public class BombTurret : Turrets
 
     public override float GetTurretCost()
     {
-        return worth;
+        return Worth;
     }
 
 }

@@ -4,18 +4,7 @@ using UnityEngine;
 
 public class DarkTurret : Turrets
 {
-    // THIS DUDE NEEDS NEW ATTACK FUNCTION
-    // BASE STATS
-    protected new float worth = 100;
-    protected new float attackDamage = 0;
-    protected new float magicDamage = 0;
-    protected new float pureDamage = 0;
-    protected new float armourPenetration = 100;
-    protected new float magicResistPenetration = 0;
-    protected new float splashRange = -1;
-    protected new float attackRange = 15;
-    protected new float attackSpeed = 1;
-    protected new float projectileSpeed = 80;
+    public new float Worth = 100;
 
     private void Awake()
     {
@@ -29,6 +18,17 @@ public class DarkTurret : Turrets
         // TODO LOAD PREFAB OF RESEOURCES ARROW
         attackType = AttackType.First;
         turretCanAttack = true;
+
+        // BASE STATS
+        attackDamage = 5;
+        magicDamage = 5;
+        pureDamage = 1;
+        armourPenetration = 50;
+        magicResistPenetration = 50;
+        splashRange = 2;
+        attackRange = 10;
+        attackSpeed = 1.5f;
+        projectileSpeed = 15;
     }
 
     // Update is called once per frame
@@ -42,11 +42,11 @@ public class DarkTurret : Turrets
 
     public override TurretType GetTurretType()
     {
-        return TurretType.Crossbow;
+        return TurretType.Dark;
     }
 
     public override float GetTurretCost()
     {
-        return worth;
+        return Worth;
     }
 }

@@ -29,9 +29,10 @@ public class Turrets : MonoBehaviour
     protected EnemySpawner enemySpawner;
     protected TurretType turretType;
     protected AttackType attackType;
-    protected float worth;
+    public virtual float Worth { get; protected set; }
     protected float sellValue;
     protected bool buffed;
+    protected float currentBuffValue;
     [SerializeField]
     protected Projectile projectilePrefab;
 
@@ -215,7 +216,7 @@ public class Turrets : MonoBehaviour
     protected void Projectile_OnDamageDealt(Projectile projectile)
     {
         if (OnTookDamage != null)
-        { 
+        {
             OnTookDamage(attackDamage, armourPenetration, magicDamage, magicResistPenetration, pureDamage, this, projectile);
         }
         else
@@ -253,19 +254,60 @@ public class Turrets : MonoBehaviour
 
     public virtual float GetTurretCost()
     {
-        return worth;
+        return Worth;
     }
 
     public virtual void BuffTurret(float multiplier)
     {
-        attackDamage *= multiplier;
-        magicDamage *= multiplier;
-        pureDamage *= multiplier;
-        attackRange *= multiplier;
-        attackSpeed *= multiplier;
+        if (!buffed)
+        {
+            attackDamage *= multiplier;
+            magicDamage *= multiplier;
+            pureDamage *= multiplier;
+            attackRange *= multiplier;
+            attackSpeed *= multiplier;
 
-        buffed = true;
+            currentBuffValue = multiplier;
+            buffed = true;
+            StartCoroutine(BuffTimer());
+        }
     }
 
-    
+    IEnumerator BuffTimer()
+    {
+        yield return new WaitForSeconds(10f);
+        yield return new WaitForEndOfFrame();
+        attackDamage /= currentBuffValue;
+        magicDamage /= currentBuffValue;
+        pureDamage /= currentBuffValue;
+        attackRange /= currentBuffValue;
+        attackSpeed /= currentBuffValue;
+        buffed = false;
+    }
+
+    public virtual void RemoveBuffs()
+    {
+        if (!buffed)
+        {
+            return;
+        }
+
+        StopCoroutine(BuffTimer());
+        attackDamage /= currentBuffValue;
+        magicDamage /= currentBuffValue;
+        pureDamage /= currentBuffValue;
+        attackRange /= currentBuffValue;
+        attackSpeed /= currentBuffValue;
+        buffed = false;
+    }
+
+    public virtual void UpgradeTurret()
+    {
+        attackDamage *= 1.2f;
+        magicDamage *= 1.2f;
+        pureDamage *= 1.2f;
+        attackRange *= 1.2f;
+        attackSpeed *= 1.2f;
+        Worth *= 1.2f;
+    }
 }

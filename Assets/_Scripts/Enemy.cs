@@ -214,6 +214,7 @@ public class Enemy : MonoBehaviour
         if (health <= 0)
         {
             StartCoroutine(Die());
+            return;
         }
 
         StartCoroutine(UpdateHealthBar());

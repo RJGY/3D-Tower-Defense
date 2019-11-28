@@ -4,18 +4,7 @@ using UnityEngine;
 
 public class HellfireTurret : Turrets
 {
-    // THIS DUDE NEEDS NEW ATTACK FUNCTION
-    // BASE STATS
-    protected new float worth = 50;
-    protected new float attackDamage = 0;
-    protected new float magicDamage = 0;
-    protected new float pureDamage = 0;
-    protected new float armourPenetration = 100;
-    protected new float magicResistPenetration = 0;
-    protected new float splashRange = -1;
-    protected new float attackRange = 15;
-    protected new float attackSpeed = 1;
-    protected new float projectileSpeed = 80;
+    public new float Worth = 500;
 
     private void Awake()
     {
@@ -29,8 +18,18 @@ public class HellfireTurret : Turrets
         // TODO LOAD PREFAB OF RESEOURCES ARROW
         attackType = AttackType.First;
         turretCanAttack = true;
-    }
 
+        // BASE STATS
+        attackDamage = 15;
+        magicDamage = 15;
+        pureDamage = 15;
+        armourPenetration = 50;
+        magicResistPenetration = 100;
+        splashRange = 15;
+        attackRange = 10;
+        attackSpeed = 1f;
+        projectileSpeed = 15;
+    }
     // Update is called once per frame
     void Update()
     {
@@ -42,11 +41,11 @@ public class HellfireTurret : Turrets
 
     public override TurretType GetTurretType()
     {
-        return TurretType.Crossbow;
+        return TurretType.Hellfire;
     }
 
     public override float GetTurretCost()
     {
-        return worth;
+        return Worth;
     }
 }

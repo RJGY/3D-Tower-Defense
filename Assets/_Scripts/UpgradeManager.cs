@@ -1,18 +1,79 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class UpgradeManager : MonoBehaviour
 {
+    public delegate void PayForUpgrade(float cost);
+    public event PayForUpgrade OnPay;
+
+    private Button upgradeButton;
+    private Turrets currentTurret = null;
+    private bool upgradeCooldown;
+
+    #region Singleton
+    public static UpgradeManager Instance = null;
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Debug.LogError("More than one UpgradeManager");
+        }
+        else
+        {
+            Instance = this;
+        }
+
+        upgradeButton = FindObjectOfType<UpgradeButton>().GetComponent<Button>();
+    }
+    #endregion
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        CloseUpgrade();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OpenUpgrade(Turrets turret)
     {
-        
+        if (currentTurret == null)
+        {
+            currentTurret = turret;
+            gameObject.SetActive(true);
+            upgradeButton.GetComponentInChildren<Text>().text = "Upgrade: " + (currentTurret.GetTurretCost() * 1.2f).ToString();
+        }
+        else
+        {
+            currentTurret = turret;
+        }
+    }
+
+    public void CloseUpgrade()
+    {
+        currentTurret = null;
+        gameObject.SetActive(false);
+    }
+
+    public void UpgradeTower()
+    {
+        if (currentTurret == null)
+        {
+            Debug.Log("No Turret selected. cannot upgrade");
+            return;
+        }
+
+        if (GameManager.Instance.GetGold() >= currentTurret.GetTurretCost() * 1.2f)
+        {
+            currentTurret.RemoveBuffs();
+            currentTurret.UpgradeTurret();
+            if (OnPay != null)
+            {
+                OnPay(currentTurret.Worth * 1.2f);
+            }
+        }
+        else
+        {
+            Debug.Log("You dont have enough money to buy the upgrade!");
+        }
     }
 }
