@@ -6,13 +6,13 @@ public class ArcherTurret : Turrets
 {
     // BASE STATS
     protected new float worth = 50;
-    protected new float attackDamage = 5;
+    protected new float attackDamage = 8;
     protected new float magicDamage = 0;
     protected new float pureDamage = 0;
     protected new float armourPenetration = 50;
     protected new float magicResistPenetration = 0;
     protected new float splashRange = -1;
-    protected new float attackRange = 10;
+    protected new float attackRange = 12;
     protected new float attackSpeed = 2;
     protected new float projectileSpeed = 40;
 

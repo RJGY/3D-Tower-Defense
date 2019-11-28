@@ -4,28 +4,30 @@ using UnityEngine;
 
 public class BombTurret : Turrets
 {
+    // BASE STATS
+    protected new float worth = 80;
+    protected new float attackDamage = 5;
+    protected new float magicDamage = 2;
+    protected new float pureDamage = 0;
+    protected new float armourPenetration = 70;
+    protected new float magicResistPenetration = 20;
+    protected new float splashRange = 3;
+    protected new float attackRange = 9;
+    protected new float attackSpeed = 0.8f;
+    protected new float projectileSpeed = 20;
+
     private void Awake()
     {
         enemySpawner = FindObjectOfType<EnemySpawner>();
         turretHead = GetComponentInChildren<TurretHead>();
     }
+
     // Start is called before the first frame update
     void Start()
     {
-        // BASE STATS
-        // TODO LOAD PREFAB OF RESEOURCES BOMB
-        turretType = TurretType.Archer;
-        attackDamage = 1;
-        magicDamage = 0;
-        pureDamage = 0;
-        armourPenetration = 50;
-        magicResistPenetration = 0;
-        splashRange = 10;
-        attackRange = 10;
-        attackSpeed = 1;
-        projectileSpeed = 30;
-        attackType = AttackType.First;
+        // TODO LOAD PREFAB OF RESEOURCES ARROW
 
+        attackType = AttackType.First;
         turretCanAttack = true;
     }
 
@@ -37,4 +39,15 @@ public class BombTurret : Turrets
             Attack();
         }
     }
+
+    public override TurretType GetTurretType()
+    {
+        return TurretType.Bomb;
+    }
+
+    public override float GetTurretCost()
+    {
+        return worth;
+    }
+
 }

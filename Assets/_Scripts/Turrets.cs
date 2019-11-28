@@ -25,12 +25,13 @@ public class Turrets : MonoBehaviour
     protected float slowAmount;
     protected float projectileSpeed;
     protected bool turretCanAttack;
-    protected float sellValue;
     protected TurretHead turretHead;
     protected EnemySpawner enemySpawner;
     protected TurretType turretType;
     protected AttackType attackType;
     protected float worth;
+    protected float sellValue;
+    protected bool buffed;
     [SerializeField]
     protected Projectile projectilePrefab;
 
@@ -57,7 +58,7 @@ public class Turrets : MonoBehaviour
         Strongest
     }
 
-    protected bool EnemyInRange()
+    virtual protected bool EnemyInRange()
     {
         bool inRange = false;
         foreach (Enemy enemy in enemySpawner.enemyList)
@@ -253,6 +254,17 @@ public class Turrets : MonoBehaviour
     public virtual float GetTurretCost()
     {
         return worth;
+    }
+
+    public virtual void BuffTurret(float multiplier)
+    {
+        attackDamage *= multiplier;
+        magicDamage *= multiplier;
+        pureDamage *= multiplier;
+        attackRange *= multiplier;
+        attackSpeed *= multiplier;
+
+        buffed = true;
     }
 
     
