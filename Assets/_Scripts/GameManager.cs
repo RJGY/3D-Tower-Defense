@@ -106,6 +106,7 @@ public class GameManager : MonoBehaviour
     private void Shop_OnPurchase(float cost)
     {
         money -= cost;
+        UpdateMoney();
     }
 
     private void EnemySpawner_OnLifeLostGM(int lives)
