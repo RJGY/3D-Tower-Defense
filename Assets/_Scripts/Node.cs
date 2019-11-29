@@ -79,4 +79,10 @@ public class Node : MonoBehaviour
             Debug.LogError("YOU CANT BUILD A TURRET, THERES A TURRET HERE ALREADY");
         }
     }
+
+    public void RemoveTower()
+    {
+        turret = null;
+        rend.material.color = defaultColor;
+    }
 }

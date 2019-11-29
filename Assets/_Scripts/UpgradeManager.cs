@@ -10,6 +10,7 @@ public class UpgradeManager : MonoBehaviour
     private Button upgradeButton;
     private Turrets currentTurret = null;
     private bool upgradeCooldown;
+    private Button sellButton;
 
     #region Singleton
     public static UpgradeManager Instance = null;
@@ -24,6 +25,7 @@ public class UpgradeManager : MonoBehaviour
             Instance = this;
         }
 
+        sellButton = FindObjectOfType<SellButon>().GetComponent<Button>();
         upgradeButton = FindObjectOfType<UpgradeButton>().GetComponent<Button>();
     }
     #endregion
@@ -41,6 +43,7 @@ public class UpgradeManager : MonoBehaviour
             currentTurret = turret;
             gameObject.SetActive(true);
             upgradeButton.GetComponentInChildren<Text>().text = "Upgrade: " + (currentTurret.GetTurretCost() * 1.2f).ToString();
+            sellButton.GetComponentInChildren<Text>().text = currentTurret.GetTurretCost().ToString();
         }
         else
         {
@@ -68,12 +71,31 @@ public class UpgradeManager : MonoBehaviour
             currentTurret.UpgradeTurret();
             if (OnPay != null)
             {
-                OnPay(currentTurret.Worth * 1.2f);
+                OnPay(currentTurret.GetTurretCost() * 1.2f);
             }
         }
         else
         {
             Debug.Log("You dont have enough money to buy the upgrade!");
         }
+        upgradeButton.GetComponentInChildren<Text>().text = "Upgrade: " + (currentTurret.GetTurretCost() * 1.2f).ToString();
+    }
+
+    public void SellTower()
+    {
+        if (currentTurret == null)
+        {
+            Debug.Log("No Turret selected. cannot sell");
+            return;
+        }
+
+        if (OnPay != null)
+        {
+            OnPay(-currentTurret.GetTurretCost() * 1.2f);
+        }
+        currentTurret.GetComponentInParent<Node>().RemoveTower();
+
+        Destroy(currentTurret.gameObject);
+        CloseUpgrade();
     }
 }

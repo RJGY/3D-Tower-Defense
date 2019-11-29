@@ -29,8 +29,7 @@ public class Turrets : MonoBehaviour
     protected EnemySpawner enemySpawner;
     protected TurretType turretType;
     protected AttackType attackType;
-    public virtual float Worth { get; protected set; }
-    protected float sellValue;
+    protected float worth;
     protected bool buffed;
     protected float currentBuffValue;
     [SerializeField]
@@ -254,7 +253,7 @@ public class Turrets : MonoBehaviour
 
     public virtual float GetTurretCost()
     {
-        return Worth;
+        return worth;
     }
 
     public virtual void BuffTurret(float multiplier)
@@ -308,6 +307,6 @@ public class Turrets : MonoBehaviour
         pureDamage *= 1.2f;
         attackRange *= 1.2f;
         attackSpeed *= 1.2f;
-        Worth *= 1.2f;
+        worth *= 1.2f;
     }
 }

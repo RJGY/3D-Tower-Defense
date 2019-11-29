@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
         upgrade.OnPay += Upgrade_OnPay;
 
         lives = 20; // TEMP
-        money = 100; // TEMP
+        money = 120; // TEMP
         difficulty = Difficulty.Medium; // TEMP
         currentWave = 0;
         maxWaves = 50;

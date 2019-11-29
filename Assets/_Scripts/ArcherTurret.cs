@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ArcherTurret : Turrets
 {
-    public new float Worth = 50;
+    public new float worth { get; protected set; } = 50;
 
     private void Awake()
     {
@@ -57,7 +57,7 @@ public class ArcherTurret : Turrets
 
     public override float GetTurretCost()
     {
-        return Worth;
+        return worth;
     }
 
 }
