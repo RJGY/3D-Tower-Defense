@@ -87,22 +87,19 @@ public class GameManager : MonoBehaviour
         UpdateMoney();
         UpdateWave();
 
-        StartCoroutine(SendDifficultyCoroutine());
-    }
-
-
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            EnemySpawner_OnEnemiesKilled(2f);
-        }
+        
     }
 
     #endregion
 
     #region Functions
+    public void StartGame()
+    {
+        EnemySpawner_OnEnemiesKilled(2f);
+        difficulty = (Difficulty)FindObjectOfType<DifficultyDropdown>().GetComponent<Dropdown>().value;
+        StartCoroutine(SendDifficultyCoroutine());
+    }
+
     private void EnemySpawner_OnEnemiesKilled(float waveDelay)
     {
         waveCounter = StartCoroutine(WaveCounter(waveDelay));
@@ -139,7 +136,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void AddGold(float gold)
+    public void AddGold(float gold)
     {
         money += gold;
         UpdateMoney();
@@ -164,6 +161,7 @@ public class GameManager : MonoBehaviour
     {
         waveText.text = "Wave: " + currentWave.ToString() + " / " + maxWaves;
     }
+    
     #endregion
 
     #region Coroutines

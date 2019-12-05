@@ -48,4 +48,10 @@ public class HellfireTurret : Turrets
     {
         return Worth;
     }
+
+    public override void UpgradeTurret()
+    {
+        base.UpgradeTurret();
+        worth *= 1.2f;
+    }
 }

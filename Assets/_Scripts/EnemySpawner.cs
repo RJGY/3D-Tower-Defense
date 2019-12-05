@@ -8,7 +8,6 @@ public class EnemySpawner : MonoBehaviour
     public event LoseALifeGM OnLifeLostGM;
     public delegate void AllEnemiesKilled(float waveDelay);
     public event AllEnemiesKilled AllEnemiesKilledInWave;
-
     #region Variables
     [Header("Enemy Spawner Variables")]
     public Enemy enemyPrefab;
@@ -24,8 +23,12 @@ public class EnemySpawner : MonoBehaviour
     private int[] firstSpawns = { 5, 7, 10, 15 };
     private int[] firstSpawnDelay = { 4, 3, 2, 1 };
     private int[] firstWaveDelay = { 15, 13, 10, 6 };
-    private int[] firstHealthSpawns = { 4, 6, 8, 11 };
+    private int[] firstHealthSpawns = { 6, 9, 14, 20 };
+    private int[] firstSpeedSpawns = { 5, 7, 10, 15 };
+    private int[] firstGoldSpawns = { 5, 6, 7, 8 };
     private float healthToSet;
+    private float goldToSet;
+    private float moveSpeedToSet;
     #endregion
 
     #region Monobehaviour
@@ -55,6 +58,8 @@ public class EnemySpawner : MonoBehaviour
             enemy.OnLifeLost += Enemy_OnLifeLost;
             enemy.JustDied += Enemy_JustDied;
             enemy.SetHealth(healthToSet);
+            enemy.SetSpeed(moveSpeedToSet);
+            enemy.SetGold(goldToSet);
             enemyList.Add(enemy);
             enemiesSpawned++;
             yield return new WaitForSeconds(spawnDelay);
@@ -78,6 +83,7 @@ public class EnemySpawner : MonoBehaviour
     {
         this.difficulty = difficulty;
     }
+
     private void GameManger_Instance_SendWaveNum(int num)
     {
         if (num == 1)
@@ -86,6 +92,8 @@ public class EnemySpawner : MonoBehaviour
             spawnDelay = firstSpawnDelay[(int)difficulty];
             waveDelay = firstWaveDelay[(int)difficulty];
             healthToSet = firstHealthSpawns[(int)difficulty];
+            moveSpeedToSet = firstSpeedSpawns[(int)difficulty];
+            goldToSet = firstGoldSpawns[(int)difficulty];
         }
         else
         {
@@ -93,6 +101,8 @@ public class EnemySpawner : MonoBehaviour
             spawnDelay = firstSpawnDelay[(int)difficulty] / Mathf.Pow(scaling.GetScaling(), num);
             waveDelay = firstWaveDelay[(int)difficulty] / Mathf.Pow(scaling.GetScaling(), num);
             healthToSet = firstHealthSpawns[(int)difficulty] * Mathf.Pow(scaling.GetScaling(), num);
+            moveSpeedToSet = firstSpeedSpawns[(int)difficulty] * Mathf.Pow(scaling.GetScaling(), num);
+            goldToSet = firstGoldSpawns[(int)difficulty] * Mathf.Pow(scaling.GetScaling(), num);
         }
 
         enemiesSpawned = 0;
@@ -105,14 +115,6 @@ public class EnemySpawner : MonoBehaviour
         enemyList.Remove(enemy);
         enemy.OnLifeLost -= Enemy_OnLifeLost;
         enemy.JustDied -= Enemy_JustDied;
-
-        if (enemyList.Capacity == 0)
-        {
-            if (AllEnemiesKilledInWave != null)
-            {
-                AllEnemiesKilledInWave(waveDelay);
-            }
-        }
     }
 
     private void Enemy_OnLifeLost(int lives, Enemy enemy)

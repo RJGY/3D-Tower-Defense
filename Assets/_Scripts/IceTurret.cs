@@ -54,4 +54,10 @@ public class IceTurret : Turrets
     {
         Debug.Log("MCDIE");
     }
+
+    public override void UpgradeTurret()
+    {
+        base.UpgradeTurret();
+        worth *= 1.2f;
+    }
 }

@@ -50,4 +50,10 @@ public class BombTurret : Turrets
         return Worth;
     }
 
+    public override void UpgradeTurret()
+    {
+        base.UpgradeTurret();
+        Worth *= 1.2f;
+    }
+
 }

@@ -18,6 +18,7 @@ public class Enemy : MonoBehaviour
     [Header("NavMeshAgent Properties")]
     private NavMeshAgent agent;
     private Transform wayPointParent;
+    [SerializeField]
     private Transform[] points;
     private int currentWayPoint;
     private float wayPointDistance = 1.5f;
@@ -90,12 +91,12 @@ public class Enemy : MonoBehaviour
             agent.stoppingDistance = agentStoppingDistance;
             agent.angularSpeed = agentAngularSpeed;
             agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-            agent.autoBraking = false;
+            agent.autoBraking = true;
+            agent.speed = moveSpeed;
             currentWayPoint = 1;
             GameManager.Instance.OnGameEnded += Instance_OnGameEnded;
             // The assigning of movespeed, health and armour/mr goes down here.
             livesWorth = 1; // TEMP, DELETE LATER
-            
         }
         else
         {
@@ -141,6 +142,16 @@ public class Enemy : MonoBehaviour
     {
         return health;
     }
+
+    public void SetSpeed(float moveSpeed)
+    {
+        this.moveSpeed = moveSpeed;
+    }
+
+    public void SetGold(float gold)
+    {
+        goldReward = gold;
+    }
     #endregion
 
     #region Functions
@@ -153,7 +164,7 @@ public class Enemy : MonoBehaviour
             Debug.LogError("No waypoints assigned.");
             return;
         }
-
+        
         agent.SetDestination(points[currentWayPoint].position);
 
         if (Vector3.Distance(transform.position, points[currentWayPoint].position) < wayPointDistance)
@@ -202,10 +213,8 @@ public class Enemy : MonoBehaviour
     void TakeDamage(float attackDamage, float armourPenetration, float magicDamage, float magicResistPenetration, float pureDamage, Turrets turret, Projectile projectile)
     {
         float damageTaken = pureDamage;
-        float effectiveArmour = armour - armourPenetration;
-        float effectiveMagicResist = magicResist - magicResistPenetration;
-        damageTaken += attackDamage * (1 - (effectiveArmour / (effectiveArmour + 100)));
-        damageTaken += magicDamage * (1 - (effectiveMagicResist / (effectiveMagicResist + 100)));
+        damageTaken += attackDamage;
+        damageTaken += magicDamage;
         health -= damageTaken;
 
         turret.OnTookDamage -= TakeDamage;
@@ -216,7 +225,7 @@ public class Enemy : MonoBehaviour
             StartCoroutine(Die());
             return;
         }
-
+        Debug.Log(damageTaken);
         StartCoroutine(UpdateHealthBar());
     }
 
@@ -227,6 +236,7 @@ public class Enemy : MonoBehaviour
 
     IEnumerator Die()
     {
+        GameManager.Instance.AddGold(goldReward);
         yield return new WaitForEndOfFrame();
         GameManager.Instance.OnGameEnded -= Instance_OnGameEnded;
 

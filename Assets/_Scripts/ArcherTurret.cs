@@ -60,4 +60,10 @@ public class ArcherTurret : Turrets
         return worth;
     }
 
+    public override void UpgradeTurret()
+    {
+        base.UpgradeTurret();
+        worth *= 1.2f;
+    }
+
 }

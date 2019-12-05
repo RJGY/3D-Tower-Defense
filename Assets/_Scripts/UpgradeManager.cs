@@ -68,11 +68,11 @@ public class UpgradeManager : MonoBehaviour
         if (GameManager.Instance.GetGold() >= currentTurret.GetTurretCost() * 1.2f)
         {
             currentTurret.RemoveBuffs();
-            currentTurret.UpgradeTurret();
             if (OnPay != null)
             {
                 OnPay(currentTurret.GetTurretCost() * 1.2f);
             }
+            currentTurret.UpgradeTurret();
         }
         else
         {
@@ -91,7 +91,7 @@ public class UpgradeManager : MonoBehaviour
 
         if (OnPay != null)
         {
-            OnPay(-currentTurret.GetTurretCost() * 1.2f);
+            OnPay(-currentTurret.GetTurretCost());
         }
         currentTurret.GetComponentInParent<Node>().RemoveTower();
 
