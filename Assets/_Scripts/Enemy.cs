@@ -40,6 +40,9 @@ public class Enemy : MonoBehaviour
     {
         Slow,
         Fast,
+        MagicImmune,
+        PhysicalImmune,
+        DamageReduction
     }
 
     public enum EnemySpecies
@@ -56,6 +59,7 @@ public class Enemy : MonoBehaviour
     #region MonoBehavior
     private void Awake()
     {
+        // GetComponents in Awake.
         agent = GetComponent<NavMeshAgent>();
         capsuleCollider = GetComponent<CapsuleCollider>();
     }
@@ -73,18 +77,28 @@ public class Enemy : MonoBehaviour
         EnemySpawner.instance.EnemySpawned -= EnemySpawner_EnemySpawned;
     }
 
+    private void OnDestroy()
+    {
+        // This is just incase the units coroutines somehow persist after destroy.
+        StopAllCoroutines();
+    }
+
     // Start is called before the first frame update
     private void Start()
     {
+        // Call functions.
         GoToEnd();
+
+        // Call Coroutines.
         StartCoroutine(CheckForEnd());
+        StartCoroutine(CheckPath());
     }
 
 
     // Update is called once per frame
     private void Update()
     {
-        
+
             
     }
     #endregion
@@ -122,15 +136,21 @@ public class Enemy : MonoBehaviour
         // Attack closest turret.
         if (Vector3.Distance(transform.position, targetedTurret.position) < attackRange)
         {
-            Debug.Log("I HAVE DESTROYED " + targetedTurret.name, targetedTurret);
+            Debug.Log("I have attacked " + targetedTurret.name, targetedTurret);
             Destroy(targetedTurret.gameObject);
         }
     }
 
+    private void AttackPlayer()
+    {
+        return;
+    }
+
     private Transform FindClosestTower()
     {
-        // Define our search radius. This is larger for smaller units and smaller for larger units.
-        float searchRadius = Mathf.Min(agent.radius * 5, agent.radius + 5); 
+        // Define our search radius.
+        float searchRadius = agent.radius + 8; 
+        // Define turret variable
         Transform closestTurret = null;
         Collider[] turrets = Physics.OverlapSphere(transform.position, searchRadius, towerLayer);
         foreach (Collider turret in turrets)
@@ -147,16 +167,22 @@ public class Enemy : MonoBehaviour
 
         return closestTurret;
     }
+
+    private void OnReachEnd()
+    {
+        Destroy(gameObject);
+    }
     #endregion
 
     #region Coroutines
 
     private IEnumerator CheckForEnd()
     {
+        // Every 0.2 seconds, check if we are colliding with the end.
         yield return new WaitForSeconds(0.2f);
         // Distance check.
         if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(endPathTransform.position.x, endPathTransform.position.z)) <= agent.radius)
-            Destroy(gameObject);
+            OnReachEnd();
         StartCoroutine(CheckForEnd());
     }
 
@@ -168,11 +194,21 @@ public class Enemy : MonoBehaviour
     private IEnumerator CheckPath()
     {
         yield return new WaitForSeconds(0.2f);
-        if (!agent.hasPath)
+        
+        if (agent.hasPath)
+        {
+            // Pathfind towards end.
+            Debug.Log("Going to end");
+            GoToEnd();
+        }
+        else if (!agent.hasPath && Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(endPathTransform.position.x, endPathTransform.position.z)) >= agent.radius)
         {
             // Attack Closest Turret
+            Debug.Log("Attacking");
             AttackTurret();
         }
+
+        StartCoroutine(CheckPath());
     }
     #endregion
 }
