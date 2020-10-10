@@ -4,134 +4,67 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public delegate void LoseALifeGM(int lives);
-    public event LoseALifeGM OnLifeLostGM;
-    public delegate void AllEnemiesKilled(float waveDelay);
-    public event AllEnemiesKilled AllEnemiesKilledInWave;
+
+    #region Events
+    public delegate void SpawnEnemy(Transform endPathTransform);
+    public event SpawnEnemy EnemySpawned;
+    #endregion
+
     #region Variables
     [Header("Enemy Spawner Variables")]
+    private Transform endPath;
     public Enemy enemyPrefab;
-    public List<Enemy> enemyList;
-    private Scaling scaling;
     private Vector3 enemySpawnpoint;
     private Coroutine spawnEnemyCoroutine;
-    private int enemiesSpawned;
+    private int enemiesSpawned = 0;
     private int maxEnemies;
     private float spawnDelay;
     private float waveDelay;
-    private GameManager.Difficulty difficulty;
-    private int[] firstSpawns = { 5, 7, 10, 15 };
-    private int[] firstSpawnDelay = { 4, 3, 2, 1 };
-    private int[] firstWaveDelay = { 15, 13, 10, 6 };
-    private int[] firstHealthSpawns = { 6, 9, 14, 20 };
-    private int[] firstSpeedSpawns = { 5, 7, 10, 15 };
-    private int[] firstGoldSpawns = { 5, 6, 7, 8 };
-    private float healthToSet;
-    private float goldToSet;
-    private float moveSpeedToSet;
     #endregion
 
     #region Monobehaviour
+    #region Singleton
+    public static EnemySpawner instance = null;
     private void Awake()
     {
-        enemySpawnpoint = transform.position;
-        scaling = FindObjectOfType<Scaling>();
+        if (instance != null)
+            Debug.LogError("More than one EndPath");
+        else
+            instance = this;
+
+        endPath = FindObjectOfType<EndPath>().GetComponent<Transform>();
     }
+    #endregion
 
     // Start is called before the first frame update
     void Start()
     {
-        GameManager.Instance.OnGameEnded += GameManager_Instance_OnGameEnded;
-        GameManager.Instance.SendWaveNum += GameManger_Instance_SendWaveNum;
-        GameManager.Instance.OnDifficultySent += GameManager_Instance_OnDifficultySent;
+        
     }
 
-    
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Return))
+        {
+            SpawnWave();
+        }
+    }
+
     #endregion
 
     #region Coroutines
-    IEnumerator SpawnEnemy()
+    // Test SpawnWave Coroutine.
+    void SpawnWave()
     {
-        if (enemiesSpawned < maxEnemies)
-        {
-            Enemy enemy = Instantiate(enemyPrefab, enemySpawnpoint, Quaternion.identity);
-            enemy.OnLifeLost += Enemy_OnLifeLost;
-            enemy.JustDied += Enemy_JustDied;
-            enemy.SetHealth(healthToSet);
-            enemy.SetSpeed(moveSpeedToSet);
-            enemy.SetGold(goldToSet);
-            enemyList.Add(enemy);
-            enemiesSpawned++;
-            yield return new WaitForSeconds(spawnDelay);
-            spawnEnemyCoroutine = StartCoroutine(SpawnEnemy());
-        }
-
-        else
-        {
-            if (AllEnemiesKilledInWave != null)
-            {
-                AllEnemiesKilledInWave(waveDelay);
-                
-            }
-        }
+        enemiesSpawned++;
+        Debug.Log(name + ": Testing. Enemies Spawned = " + enemiesSpawned, this);
+        Enemy enemy = Instantiate(enemyPrefab, transform);
+        EnemySpawned?.Invoke(endPath);
     }
 
     #endregion
 
     #region Functions
-    private void GameManager_Instance_OnDifficultySent(GameManager.Difficulty difficulty)
-    {
-        this.difficulty = difficulty;
-    }
-
-    private void GameManger_Instance_SendWaveNum(int num)
-    {
-        if (num == 1)
-        {
-            maxEnemies = firstSpawns[(int)difficulty];
-            spawnDelay = firstSpawnDelay[(int)difficulty];
-            waveDelay = firstWaveDelay[(int)difficulty];
-            healthToSet = firstHealthSpawns[(int)difficulty];
-            moveSpeedToSet = firstSpeedSpawns[(int)difficulty];
-            goldToSet = firstGoldSpawns[(int)difficulty];
-        }
-        else
-        {
-            maxEnemies = Mathf.RoundToInt(firstSpawns[(int)difficulty] * Mathf.Pow(scaling.GetScaling(), num));
-            spawnDelay = firstSpawnDelay[(int)difficulty] / Mathf.Pow(scaling.GetScaling(), num);
-            waveDelay = firstWaveDelay[(int)difficulty] / Mathf.Pow(scaling.GetScaling(), num);
-            healthToSet = firstHealthSpawns[(int)difficulty] * Mathf.Pow(scaling.GetScaling(), num);
-            moveSpeedToSet = firstSpeedSpawns[(int)difficulty] * Mathf.Pow(scaling.GetScaling(), num);
-            goldToSet = firstGoldSpawns[(int)difficulty] * Mathf.Pow(scaling.GetScaling(), num);
-        }
-
-        enemiesSpawned = 0;
-        spawnEnemyCoroutine = StartCoroutine(SpawnEnemy());
-    }
-    
-
-    private void Enemy_JustDied(Enemy enemy)
-    {
-        enemyList.Remove(enemy);
-        enemy.OnLifeLost -= Enemy_OnLifeLost;
-        enemy.JustDied -= Enemy_JustDied;
-    }
-
-    private void Enemy_OnLifeLost(int lives, Enemy enemy)
-    {
-        enemy.OnLifeLost -= Enemy_OnLifeLost;
-        enemy.JustDied -= Enemy_JustDied;
-        enemyList.Remove(enemy);
-        if (OnLifeLostGM != null)
-        {
-            OnLifeLostGM(lives);
-        }
-    }
-
-    private void GameManager_Instance_OnGameEnded()
-    {
-        StopCoroutine(spawnEnemyCoroutine);
-    }
 
     #endregion
 }

@@ -4,49 +4,36 @@ using UnityEngine;
 
 public class BuildManager : MonoBehaviour
 {
-    private Turrets turretToBuild;
-    public Turrets[] turrets;
+    [SerializeField] private Turrets turretToBuild;
 
     #region Singleton
-    public static BuildManager Instance = null;
+    public static BuildManager instance = null;
     private void Awake()
     {
-        if (Instance != null)
-        {
+        if (instance != null)
             Debug.LogError("More than one buildManager");
-        }
-        else
-        {
-            Instance = this;
-        }
+
+        instance = this;
     }
     #endregion
 
+    #region Monobehaviour
     private void Start()
     {
-        turretToBuild = turrets[0];
+        
     }
+    #endregion
 
+    #region Functions
     public Turrets GetTurretToBuild()
     {
         return turretToBuild;
     }
 
-    public float GetTurretPrice()
-    {
-        return turretToBuild.GetTurretCost();
-    }
-
     public void SetTurretToBuild(Turrets.TurretType turretType)
     {
-        foreach (Turrets turret in turrets)
-        {
-            if (turretType == turret.GetTurretType())
-            {
-                turretToBuild = turret;
-                return;
-            }
-        }
-        Debug.LogError("GONE WRONG");
+        
     }
+    #endregion
+
 }

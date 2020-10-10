@@ -6,32 +6,23 @@ using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
+    #region Events
+
+    #endregion 
+
     #region Variables
-    public delegate void LostALife(int lives, Enemy enemy);
-    public event LostALife OnLifeLost;
-    public delegate void EnemyKilled(Enemy enemy);
-    public event EnemyKilled JustDied;
-    /*
-    public delegate void SendHealth(float health);
-    public event SendHealth OnHealthSent;
-    */
     [Header("NavMeshAgent Properties")]
     private NavMeshAgent agent;
-    private Transform wayPointParent;
-    [SerializeField]
-    private Transform[] points;
-    private int currentWayPoint;
-    private float wayPointDistance = 1.5f;
-    private float agentStoppingDistance = 0f;
-    private float agentAngularSpeed = 400;
-    private float agentAcceleration = 40;
-    private bool agentCanMove = true;
+    [SerializeField] private LayerMask towerLayer;
+    private CapsuleCollider capsuleCollider;
+    private Transform endPathTransform;
 
     [Header("Enemy Statistics")]
     private EnemyType enemyType;
     private EnemySpecies enemyArt;
-    private GameManager.Difficulty difficulty;
-    
+    [SerializeField] private float attackRange;
+    private float attackDamage;
+    private float attackRate;
     private float maxHealth;
     private float health;
     private float moveSpeed;
@@ -39,10 +30,10 @@ public class Enemy : MonoBehaviour
     private float magicResist;
     private int livesWorth;
     private float goldReward;
+    private Transform targetedTurret;
 
-    [Header("EnemyUI")]
+    [Header("Enemy UI")]
     private Image healthImage;
-
 
     // These enums are for assigning stats on start.
     public enum EnemyType
@@ -65,194 +56,123 @@ public class Enemy : MonoBehaviour
     #region MonoBehavior
     private void Awake()
     {
-        GameManager.Instance.OnDifficultySent += GameManager_Instance_OnDifficultySent;
-        healthImage = FindObjectOfType<HealthBar>().GetComponent<Image>();
         agent = GetComponent<NavMeshAgent>();
-        wayPointParent = FindObjectOfType<WaypointParent>().GetComponent<Transform>();
-        
-        if (wayPointParent != null)
-        {
-            points = wayPointParent.GetComponentsInChildren<Transform>();
-        }
-        else
-        {
-            Debug.LogError("NO WAYPOINT PARENT ATTACHED");
-        }
+        capsuleCollider = GetComponent<CapsuleCollider>();
     }
 
+    // OnEnable is called before Start
+    private void OnEnable()
+    {
+        // Subscribe event.
+        EnemySpawner.instance.EnemySpawned += EnemySpawner_EnemySpawned;
+    }
 
+    private void OnDisable()
+    {
+        // This is just incase the event does not unsubscribe when it triggers.
+        EnemySpawner.instance.EnemySpawned -= EnemySpawner_EnemySpawned;
+    }
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        if (agent != null)
-        {
-            agent.acceleration = agentAcceleration;
-            agent.stoppingDistance = agentStoppingDistance;
-            agent.angularSpeed = agentAngularSpeed;
-            agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-            agent.autoBraking = true;
-            agent.speed = moveSpeed;
-            currentWayPoint = 1;
-            GameManager.Instance.OnGameEnded += Instance_OnGameEnded;
-            // The assigning of movespeed, health and armour/mr goes down here.
-            livesWorth = 1; // TEMP, DELETE LATER
-        }
-        else
-        {
-            Debug.LogError("NO AGENT ATTACHED");
-        }
-
-        StartCoroutine(UpdateHealthBar());
+        GoToEnd();
+        StartCoroutine(CheckForEnd());
     }
 
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (agentCanMove)
-        {
-            GoToEnd();
-        }
-        else
-        {
-            if (!agent.isStopped)
-            {
-                agent.isStopped = true;
-            }
-        }
-        // Need a gamemanager to check if the enemy is slowed or not.
-        // Make slowing enemies an event.
-    }
-    #endregion
-
-    #region Public Functions
-    public void SetHealth(float maxHealth)
-    {
-        this.maxHealth = maxHealth;
-        health = maxHealth;
-    }
-
-    public void SplashSubscribeToTurret(Projectile projectile)
-    {
-        projectile.SendBackToEnemy += Enemy_OnEnemyHit;
-    }
-
-    public float GetHealth()
-    {
-        return health;
-    }
-
-    public void SetSpeed(float moveSpeed)
-    {
-        this.moveSpeed = moveSpeed;
-    }
-
-    public void SetGold(float gold)
-    {
-        goldReward = gold;
+        
+            
     }
     #endregion
 
     #region Functions
-    void GoToEnd()
+    private void GoToEnd()
     {
-        // If there are no points in the array.
-        if (points.Length < 1)
-        {
-            // Send error to console and get out.
-            Debug.LogError("No waypoints assigned.");
-            return;
-        }
-        
-        agent.SetDestination(points[currentWayPoint].position);
+        // Go towards the end point.
+        agent.SetDestination(endPathTransform.position);
+    }
 
-        if (Vector3.Distance(transform.position, points[currentWayPoint].position) < wayPointDistance)
+    private void EnemySpawner_EnemySpawned(Transform endPathTransform)
+    {
+        // Assign the end point via Event.
+        this.endPathTransform = endPathTransform;
+        // Unsubscribe event.
+        EnemySpawner.instance.EnemySpawned -= EnemySpawner_EnemySpawned;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(transform.position, Mathf.Min(agent.radius * 10, agent.radius + 10));
+    }
+
+
+    private void AttackTurret()
+    {
+        // Find closest turret
+        targetedTurret = FindClosestTower();
+
+        // Pathfind towards turret
+        Debug.Log("Pathing towards " + targetedTurret.name, targetedTurret);
+        agent.SetDestination(targetedTurret.transform.position);
+
+        // Attack closest turret.
+        if (Vector3.Distance(transform.position, targetedTurret.position) < attackRange)
         {
-            if (currentWayPoint < points.Length - 1)
-            {
-                currentWayPoint++;
-            }
+            Debug.Log("I HAVE DESTROYED " + targetedTurret.name, targetedTurret);
+            Destroy(targetedTurret.gameObject);
+        }
+    }
+
+    private Transform FindClosestTower()
+    {
+        // Define our search radius. This is larger for smaller units and smaller for larger units.
+        float searchRadius = Mathf.Min(agent.radius * 5, agent.radius + 5); 
+        Transform closestTurret = null;
+        Collider[] turrets = Physics.OverlapSphere(transform.position, searchRadius, towerLayer);
+        foreach (Collider turret in turrets)
+        {
+            if (closestTurret == null)
+                closestTurret = turret.transform;
             else
             {
-                LoseALife();
+                Transform currentTurretTransform = turret.transform;
+                if (Vector3.Distance(currentTurretTransform.position, transform.position) < Vector3.Distance(closestTurret.position, transform.position))
+                    closestTurret = turret.transform;
             }
         }
+
+        return closestTurret;
+    }
+    #endregion
+
+    #region Coroutines
+
+    private IEnumerator CheckForEnd()
+    {
+        yield return new WaitForSeconds(0.2f);
+        // Distance check.
+        if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(endPathTransform.position.x, endPathTransform.position.z)) <= agent.radius)
+            Destroy(gameObject);
+        StartCoroutine(CheckForEnd());
     }
 
-    void LoseALife()
+    private IEnumerator AttackCooldown()
     {
-        // Player should lose a life because the enemy reached the end of the level.
-        if (OnLifeLost != null)
+        yield return new WaitForSeconds(attackRate);
+    }
+
+    private IEnumerator CheckPath()
+    {
+        yield return new WaitForSeconds(0.2f);
+        if (!agent.hasPath)
         {
-            // 
-            GameManager.Instance.OnGameEnded -= Instance_OnGameEnded;
-            OnLifeLost(livesWorth, this);
+            // Attack Closest Turret
+            AttackTurret();
         }
-        Destroy(gameObject);
-    }
-
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.GetComponent<Projectile>() != null)
-        {
-            other.GetComponent<Projectile>().SendBackToEnemy += Enemy_OnEnemyHit;
-        }
-    }
-    private void Instance_OnGameEnded()
-    {
-        agentCanMove = false;
-    }
-
-    private void Enemy_OnEnemyHit(Turrets turret)
-    {
-        turret.OnTookDamage += TakeDamage;
-    }
-
-    void TakeDamage(float attackDamage, float armourPenetration, float magicDamage, float magicResistPenetration, float pureDamage, Turrets turret, Projectile projectile)
-    {
-        float damageTaken = pureDamage;
-        damageTaken += attackDamage;
-        damageTaken += magicDamage;
-        health -= damageTaken;
-
-        turret.OnTookDamage -= TakeDamage;
-        projectile.SendBackToEnemy -= Enemy_OnEnemyHit;
-
-        if (health <= 0)
-        {
-            StartCoroutine(Die());
-            return;
-        }
-        Debug.Log(damageTaken);
-        StartCoroutine(UpdateHealthBar());
-    }
-
-    private void GameManager_Instance_OnDifficultySent(GameManager.Difficulty difficulty)
-    {
-        this.difficulty = difficulty;
-    }
-
-    IEnumerator Die()
-    {
-        GameManager.Instance.AddGold(goldReward);
-        yield return new WaitForEndOfFrame();
-        GameManager.Instance.OnGameEnded -= Instance_OnGameEnded;
-
-        if (JustDied != null)
-        {
-            JustDied(this);
-        }
-
-        Destroy(gameObject);
-    }
-
-    IEnumerator UpdateHealthBar()
-    {
-        yield return new WaitForEndOfFrame();
-        float amount = Mathf.Clamp01(health / maxHealth);
-        healthImage.fillAmount = amount;
     }
     #endregion
 }
