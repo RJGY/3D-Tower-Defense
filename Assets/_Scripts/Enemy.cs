@@ -170,6 +170,7 @@ public class Enemy : MonoBehaviour
 
     private void OnReachEnd()
     {
+        // Link to GameManager to lose lives.
         Destroy(gameObject);
     }
     #endregion
