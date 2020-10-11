@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
+using Btkalman.Util;
 
 public class Enemy : MonoBehaviour
 {
@@ -14,8 +15,8 @@ public class Enemy : MonoBehaviour
     [Header("NavMeshAgent Properties")]
     private NavMeshAgent agent;
     [SerializeField] private LayerMask towerLayer;
-    private CapsuleCollider capsuleCollider;
     private Transform endPathTransform;
+    private Timer pathCheckTimer;
 
     [Header("Enemy Statistics")]
     private EnemyType enemyType;
@@ -23,6 +24,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float attackRange;
     private float attackDamage;
     private float attackRate;
+    private Timer attackCooldownTimer;
     private float maxHealth;
     private float health;
     private float moveSpeed;
@@ -61,7 +63,6 @@ public class Enemy : MonoBehaviour
     {
         // GetComponents in Awake.
         agent = GetComponent<NavMeshAgent>();
-        capsuleCollider = GetComponent<CapsuleCollider>();
     }
 
     // OnEnable is called before Start
@@ -86,6 +87,10 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+        // Assign Variables
+        attackRate = 1;
+        attackCooldownTimer = new Timer(1 / attackRate);
+
         // Call functions.
         GoToEnd();
 
@@ -107,7 +112,10 @@ public class Enemy : MonoBehaviour
     private void GoToEnd()
     {
         // Go towards the end point.
-        agent.SetDestination(endPathTransform.position);
+        if (agent.destination != endPathTransform.position)
+        {
+            agent.SetDestination(endPathTransform.position);
+        }
     }
 
     private void EnemySpawner_EnemySpawned(Transform endPathTransform)
@@ -127,17 +135,24 @@ public class Enemy : MonoBehaviour
     private void AttackTurret()
     {
         // Find closest turret
-        targetedTurret = FindClosestTower();
+        if (targetedTurret == null)
+            targetedTurret = FindClosestTower();
 
         // Pathfind towards turret
-        Debug.Log("Pathing towards " + targetedTurret.name, targetedTurret);
-        agent.SetDestination(targetedTurret.transform.position);
-
+        if (agent.destination != targetedTurret.transform.position)
+        {
+            Debug.Log("Pathing towards " + targetedTurret.name, targetedTurret);
+            agent.SetDestination(targetedTurret.transform.position);
+        }
+        
         // Attack closest turret.
         if (Vector3.Distance(transform.position, targetedTurret.position) < attackRange)
         {
-            Debug.Log("I have attacked " + targetedTurret.name, targetedTurret);
-            Destroy(targetedTurret.gameObject);
+            if (TimerCheck(Time.deltaTime, attackCooldownTimer))
+            {
+                Debug.Log("I have attacked " + targetedTurret.name, targetedTurret);
+                Destroy(targetedTurret.gameObject);
+            }
         }
     }
 
@@ -171,31 +186,28 @@ public class Enemy : MonoBehaviour
     private void OnReachEnd()
     {
         // Link to GameManager to lose lives.
+
+        // Destroy myself
         Destroy(gameObject);
     }
     #endregion
 
     #region Coroutines
 
-    private IEnumerator CheckForEnd()
+    private void CheckForEnd()
     {
         // Every 0.2 seconds, check if we are colliding with the end.
-        yield return new WaitForSeconds(0.2f);
+
         // Distance check.
         if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(endPathTransform.position.x, endPathTransform.position.z)) <= agent.radius)
             OnReachEnd();
-        StartCoroutine(CheckForEnd());
+
     }
 
-    private IEnumerator AttackCooldown()
+    private void CheckPath()
     {
-        yield return new WaitForSeconds(attackRate);
-    }
 
-    private IEnumerator CheckPath()
-    {
-        yield return new WaitForSeconds(0.2f);
-        
+
         if (agent.hasPath)
         {
             // Pathfind towards end.
@@ -209,7 +221,22 @@ public class Enemy : MonoBehaviour
             AttackTurret();
         }
 
-        StartCoroutine(CheckPath());
+
     }
+
+    private bool TimerCheck(float deltaTime, Timer timer)
+    {
+        timer.StartIfNotStarted();
+
+        if (timer.Update(deltaTime))
+        {
+            // Attack
+            return true;
+        }
+
+        return false;
+    }
+
+    
     #endregion
 }

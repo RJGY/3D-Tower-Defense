@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 namespace Btkalman.Util {
     class InputActionState {
-        public bool hold { get; private set; } = false;
+        public bool Hold { get; private set; } = false;
 
         private InputAction action;
         private float startedTimer = float.NaN;
@@ -40,12 +40,12 @@ namespace Btkalman.Util {
         }
 
         private void OnStarted(InputAction.CallbackContext context) {
-            hold = true;
+            Hold = true;
             startedTimer = 0f;
         }
 
         private void OnCanceled(InputAction.CallbackContext context) {
-            hold = false;
+            Hold = false;
         }
     }
 }
