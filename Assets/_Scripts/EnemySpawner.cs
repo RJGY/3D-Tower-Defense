@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -44,7 +45,11 @@ public class EnemySpawner : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Return))
+        var keyboard = Keyboard.current;
+        if (keyboard == null)
+            return; // No gamepad connected.
+
+        if (keyboard.enterKey.wasPressedThisFrame)
         {
             SpawnWave();
         }

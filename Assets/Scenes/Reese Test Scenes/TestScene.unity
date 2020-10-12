@@ -5133,7 +5133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca24bee1579a8ee4aa43048ec94674c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turretToBuild: {fileID: 2778747233748789437, guid: 22170366d0282994b9a2c3952928af98,
+  testTurret: {fileID: 2778747233748789437, guid: 22170366d0282994b9a2c3952928af98,
     type: 3}
 --- !u!1001 &1595835245
 PrefabInstance:
@@ -6806,4 +6806,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 230295067755572406, guid: cefbf84aa75f18d4494bdc4fa85e9bbe,
     type: 3}
-  enemyList: []

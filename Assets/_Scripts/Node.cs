@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.PlayerLoop;
 
 public class Node : MonoBehaviour
 {
@@ -11,6 +13,7 @@ public class Node : MonoBehaviour
     private Turrets _childTurret;
     private Renderer _rend;
     private Color startColor;
+    [SerializeField] private LayerMask nodeLayer;
 
     #endregion
 
@@ -25,24 +28,33 @@ public class Node : MonoBehaviour
     private void Start()
     {
         startColor = _rend.material.color;
+
+        
+
+        
     }
 
-    private void OnMouseDown()
+    void Update()
     {
-        if (_childTurret != null)
-            return;
+        var mouse = Mouse.current;
 
-        _childTurret = Instantiate(BuildManager.instance.GetTurretToBuild(), transform);
-    }
+        if (mouse != null)
+        {
+            if (mouse.leftButton.wasPressedThisFrame)
+            {
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
+                if (Physics.Raycast(ray, out hit, nodeLayer))
+                {
+                    if (hit.transform == transform)
+                    {
+                        _childTurret = Instantiate(BuildManager.instance.TurretToBuild, transform);
+                    }
+                }
+            }
+        }
 
-    private void OnMouseEnter()
-    {
-        _rend.material.color = hoverColor;
-    }
 
-    private void OnMouseExit()
-    {
-        _rend.material.color = startColor;
     }
 
     #endregion

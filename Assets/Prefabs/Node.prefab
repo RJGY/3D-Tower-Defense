@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 7673687298039154605}
   - component: {fileID: 8670848937969697738}
   - component: {fileID: 3019586667732042044}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -138,3 +138,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hoverColor: {r: 0.14195444, g: 0.5380843, b: 0.5471698, a: 1}
+  nodeLayer:
+    serializedVersion: 2
+    m_Bits: 8192

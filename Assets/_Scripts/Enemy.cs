@@ -90,21 +90,21 @@ public class Enemy : MonoBehaviour
         // Assign Variables
         attackRate = 1;
         attackCooldownTimer = new Timer(1 / attackRate);
+        pathCheckTimer = new Timer(0.2f);
+        agent.SetDestination(endPathTransform.position);
 
         // Call functions.
         GoToEnd();
 
         // Call Coroutines.
-        StartCoroutine(CheckForEnd());
-        StartCoroutine(CheckPath());
     }
 
 
     // Update is called once per frame
     private void Update()
     {
+        CheckPath();
 
-            
     }
     #endregion
 
@@ -116,6 +116,10 @@ public class Enemy : MonoBehaviour
         {
             agent.SetDestination(endPathTransform.position);
         }
+
+        // Distance check.
+        if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(endPathTransform.position.x, endPathTransform.position.z)) <= agent.radius)
+            OnReachEnd();
     }
 
     private void EnemySpawner_EnemySpawned(Transform endPathTransform)
@@ -148,6 +152,8 @@ public class Enemy : MonoBehaviour
         // Attack closest turret.
         if (Vector3.Distance(transform.position, targetedTurret.position) < attackRange)
         {
+            Debug.Log("I am attempting to attack " + targetedTurret.name);
+            Debug.Log(attackCooldownTimer.countdown);
             if (TimerCheck(Time.deltaTime, attackCooldownTimer))
             {
                 Debug.Log("I have attacked " + targetedTurret.name, targetedTurret);
@@ -193,35 +199,23 @@ public class Enemy : MonoBehaviour
     #endregion
 
     #region Coroutines
-
-    private void CheckForEnd()
-    {
-        // Every 0.2 seconds, check if we are colliding with the end.
-
-        // Distance check.
-        if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(endPathTransform.position.x, endPathTransform.position.z)) <= agent.radius)
-            OnReachEnd();
-
-    }
-
     private void CheckPath()
     {
-
-
-        if (agent.hasPath)
+        if (TimerCheck(Time.deltaTime, pathCheckTimer))
         {
-            // Pathfind towards end.
-            Debug.Log("Going to end");
-            GoToEnd();
+            if (agent.pathPending)
+            {
+                // Pathfind towards end.
+                Debug.Log("Going to end");
+                GoToEnd();
+            }
+            else if (!agent.pathPending && Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(endPathTransform.position.x, endPathTransform.position.z)) >= agent.radius)
+            {
+                // Attack Closest Turret
+                Debug.Log("Attacking");
+                AttackTurret();
+            }
         }
-        else if (!agent.hasPath && Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(endPathTransform.position.x, endPathTransform.position.z)) >= agent.radius)
-        {
-            // Attack Closest Turret
-            Debug.Log("Attacking");
-            AttackTurret();
-        }
-
-
     }
 
     private bool TimerCheck(float deltaTime, Timer timer)

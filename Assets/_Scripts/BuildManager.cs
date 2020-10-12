@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class BuildManager : MonoBehaviour
 {
-    [SerializeField] private Turrets turretToBuild;
+    public Turrets TurretToBuild { get; private set; }
+
+    [SerializeField] private Turrets testTurret;
 
     #region Singleton
     public static BuildManager instance = null;
@@ -20,15 +22,11 @@ public class BuildManager : MonoBehaviour
     #region Monobehaviour
     private void Start()
     {
-        
+        TurretToBuild = testTurret;
     }
     #endregion
 
     #region Functions
-    public Turrets GetTurretToBuild()
-    {
-        return turretToBuild;
-    }
 
     public void SetTurretToBuild(Turrets.TurretType turretType)
     {
