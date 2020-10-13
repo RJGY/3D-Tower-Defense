@@ -16,15 +16,18 @@ public class Enemy : MonoBehaviour
     private NavMeshAgent agent;
     [SerializeField] private LayerMask towerLayer;
     private Transform endPathTransform;
-    private Timer pathCheckTimer;
 
     [Header("Enemy Statistics")]
     private EnemyType enemyType;
     private EnemySpecies enemyArt;
+
+    [Header("Enemy Attack Variables")]
     [SerializeField] private float attackRange;
     private float attackDamage;
     private float attackRate;
-    private Timer attackCooldownTimer;
+    private bool canAttack;
+
+
     private float maxHealth;
     private float health;
     private float moveSpeed;
@@ -88,15 +91,19 @@ public class Enemy : MonoBehaviour
     private void Start()
     {
         // Assign Variables
-        attackRate = 1;
-        attackCooldownTimer = new Timer(1 / attackRate);
-        pathCheckTimer = new Timer(0.2f);
+        //TESTS
+        attackRate = 0.2f;
+        attackRange = 1.5f;
+        attackDamage = 10f;
+        canAttack = true;
+
         agent.SetDestination(endPathTransform.position);
 
         // Call functions.
         GoToEnd();
 
         // Call Coroutines.
+        StartCoroutine(CheckPath());
     }
 
 
@@ -104,7 +111,6 @@ public class Enemy : MonoBehaviour
     private void Update()
     {
         CheckPath();
-
     }
     #endregion
 
@@ -116,10 +122,10 @@ public class Enemy : MonoBehaviour
         {
             agent.SetDestination(endPathTransform.position);
         }
-
-        // Distance check.
-        if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(endPathTransform.position.x, endPathTransform.position.z)) <= agent.radius)
-            OnReachEnd();
+        else
+        {
+            Debug.LogError("Agent Destination not set.");
+        }
     }
 
     private void EnemySpawner_EnemySpawned(Transform endPathTransform)
@@ -136,7 +142,7 @@ public class Enemy : MonoBehaviour
     }
 
 
-    private void AttackTurret()
+    private void Attack()
     {
         // Find closest turret
         if (targetedTurret == null)
@@ -145,7 +151,6 @@ public class Enemy : MonoBehaviour
         // Pathfind towards turret
         if (agent.destination != targetedTurret.transform.position)
         {
-            Debug.Log("Pathing towards " + targetedTurret.name, targetedTurret);
             agent.SetDestination(targetedTurret.transform.position);
         }
         
@@ -153,11 +158,14 @@ public class Enemy : MonoBehaviour
         if (Vector3.Distance(transform.position, targetedTurret.position) < attackRange)
         {
             Debug.Log("I am attempting to attack " + targetedTurret.name);
-            Debug.Log(attackCooldownTimer.countdown);
-            if (TimerCheck(Time.deltaTime, attackCooldownTimer))
+            if (canAttack)
             {
                 Debug.Log("I have attacked " + targetedTurret.name, targetedTurret);
                 Destroy(targetedTurret.gameObject);
+                GoToEnd();
+                // Attack reset.
+                canAttack = false;
+                StartCoroutine(AttackCooldown());
             }
         }
     }
@@ -199,36 +207,33 @@ public class Enemy : MonoBehaviour
     #endregion
 
     #region Coroutines
-    private void CheckPath()
+    private IEnumerator CheckPath()
     {
-        if (TimerCheck(Time.deltaTime, pathCheckTimer))
+        yield return new WaitForSeconds(0.2f);
+
+        if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(endPathTransform.position.x, endPathTransform.position.z)) <= agent.radius)
         {
-            if (agent.pathPending)
-            {
-                // Pathfind towards end.
-                Debug.Log("Going to end");
-                GoToEnd();
-            }
-            else if (!agent.pathPending && Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(endPathTransform.position.x, endPathTransform.position.z)) >= agent.radius)
-            {
-                // Attack Closest Turret
-                Debug.Log("Attacking");
-                AttackTurret();
-            }
+            // End reached.
+            OnReachEnd();
         }
-    }
-
-    private bool TimerCheck(float deltaTime, Timer timer)
-    {
-        timer.StartIfNotStarted();
-
-        if (timer.Update(deltaTime))
+        else if (!agent.pathPending && (!agent.hasPath || agent.velocity.sqrMagnitude == 0f) && (agent.path.status == NavMeshPathStatus.PathPartial || agent.path.status == NavMeshPathStatus.PathInvalid))
         {
             // Attack
-            return true;
+            Attack();
         }
 
-        return false;
+        StartCoroutine(CheckPath());
+    }
+
+    private IEnumerator AttackCooldown()
+    {
+        if (!canAttack)
+        {
+            yield return new WaitForSeconds(1 / attackRate);
+            canAttack = true;
+        }
+        
+        yield return new WaitForEndOfFrame();
     }
 
     
