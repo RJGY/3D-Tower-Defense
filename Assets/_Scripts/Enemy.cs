@@ -161,11 +161,17 @@ public class Enemy : MonoBehaviour
             if (canAttack)
             {
                 Debug.Log("I have attacked " + targetedTurret.name, targetedTurret);
+
+                // Deal Damage
+                // Damage should be dealt through animation event.
+                Debug.Log("I dealt " + attackDamage + " damage.");
                 Destroy(targetedTurret.gameObject);
-                GoToEnd();
+
                 // Attack reset.
+
                 canAttack = false;
                 StartCoroutine(AttackCooldown());
+                GoToEnd();
             }
         }
     }
@@ -211,12 +217,14 @@ public class Enemy : MonoBehaviour
     {
         yield return new WaitForSeconds(0.2f);
 
+        Debug.Log("Checking Path");
+
         if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(endPathTransform.position.x, endPathTransform.position.z)) <= agent.radius)
         {
             // End reached.
             OnReachEnd();
         }
-        else if (!agent.pathPending && (!agent.hasPath || agent.velocity.sqrMagnitude == 0f) && (agent.path.status == NavMeshPathStatus.PathPartial || agent.path.status == NavMeshPathStatus.PathInvalid))
+        else if (!agent.pathPending && (!agent.hasPath || agent.velocity.sqrMagnitude == 0f))
         {
             // Attack
             Attack();
