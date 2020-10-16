@@ -90,17 +90,9 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        // Assign Variables
-        //TESTS
-        attackRate = 0.2f;
-        attackRange = 1.5f;
-        attackDamage = 10f;
-        canAttack = true;
-
-        agent.SetDestination(endPathTransform.position);
-
         // Call functions.
         GoToEnd();
+        AssignStats();
 
         // Call Coroutines.
         StartCoroutine(CheckPath());
@@ -115,6 +107,7 @@ public class Enemy : MonoBehaviour
     #endregion
 
     #region Functions
+
     private void GoToEnd()
     {
         // Go towards the end point.
@@ -126,6 +119,20 @@ public class Enemy : MonoBehaviour
         {
             Debug.LogError("Agent Destination not set.");
         }
+    }
+
+    private void AssignStats()
+    {
+        // Assign Variables
+        // Put this into a switch statement later.
+        attackRate = 0.2f;
+        attackRange = 1.5f;
+        attackDamage = 10f;
+        maxHealth = 10;
+        health = maxHealth;
+        moveSpeed = 3.5f;
+        agent.speed = moveSpeed;
+        canAttack = true;
     }
 
     private void EnemySpawner_EnemySpawned(Transform endPathTransform)
@@ -174,12 +181,7 @@ public class Enemy : MonoBehaviour
                 GoToEnd();
             }
         }
-    }
-
-    private void AttackPlayer()
-    {
-        return;
-    }
+    }       
 
     private Transform FindClosestTower()
     {
@@ -208,6 +210,23 @@ public class Enemy : MonoBehaviour
         // Link to GameManager to lose lives.
 
         // Destroy myself
+        Destroy(gameObject);
+    }
+
+    public void TakeDamage(float physDamage, float magicDamage)
+    {
+        // This needs to be an event later on.
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        // Give gold reward to gamemanager.
+        
+        // Destroy gameobject
         Destroy(gameObject);
     }
     #endregion
