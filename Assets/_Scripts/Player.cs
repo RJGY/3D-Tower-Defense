@@ -6,9 +6,14 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
+    #region Variables
     private NavMeshAgent agent;
     [SerializeField] private LayerMask groundLayer;
-    
+
+    #endregion
+
+    #region Monobehaviour
+
     private void Awake()
     {
         // GetComponents in Awake.
@@ -29,16 +34,22 @@ public class Player : MonoBehaviour
             MoveToPoint();
         }
 
-        if (!agent.isStopped)
+        if (agent.velocity.sqrMagnitude > Mathf.Epsilon)
         {
-            var targetPosition = agent.pathEndPosition;
-            var targetPoint = new Vector3(targetPosition.x, transform.position.y, targetPosition.z);
-            var _direction = (targetPoint - transform.position).normalized;
-            var _lookRotation = Quaternion.LookRotation(_direction);
-
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, _lookRotation, 360);
+            InstantRotation();
         }
 
+    }
+
+    #endregion
+
+    #region Functions
+
+    void InstantRotation()
+    {
+        var _lookRotation = Quaternion.LookRotation(agent.velocity.normalized);
+
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, _lookRotation, 8);
     }
 
     void MoveToPoint()
@@ -52,4 +63,5 @@ public class Player : MonoBehaviour
             agent.SetDestination(hit.point);
         }
     }
+    #endregion
 }

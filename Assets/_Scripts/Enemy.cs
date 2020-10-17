@@ -234,9 +234,8 @@ public class Enemy : MonoBehaviour
     #region Coroutines
     private IEnumerator CheckPath()
     {
+        // Check every 0.2 seconds.
         yield return new WaitForSeconds(0.2f);
-
-        Debug.Log("Checking Path");
 
         if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(endPathTransform.position.x, endPathTransform.position.z)) <= agent.radius)
         {
@@ -249,6 +248,7 @@ public class Enemy : MonoBehaviour
             Attack();
         }
 
+        // Restart Coroutine.
         StartCoroutine(CheckPath());
     }
 
