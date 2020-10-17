@@ -7,9 +7,15 @@ using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
 {
     #region Variables
+    [Header("NavMesh Properties")]
     private NavMeshAgent agent;
-    [SerializeField] private LayerMask groundLayer;
+    
 
+    [Header("Combat Properties")]
+    private float health;
+    private float maxHealth;
+    private float physDamage;
+    private float magicDamage;
     #endregion
 
     #region Monobehaviour
@@ -23,27 +29,30 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        agent.updateRotation = false;
+        AssignStats();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Mouse.current.rightButton.wasPressedThisFrame)
-        {
-            MoveToPoint();
-        }
-
         if (agent.velocity.sqrMagnitude > Mathf.Epsilon)
         {
             InstantRotation();
         }
-
     }
 
     #endregion
 
     #region Functions
+
+    private void AssignStats()
+    {
+        maxHealth = 100;
+        health = maxHealth;
+        physDamage = 5;
+        magicDamage = 5;
+        agent.updateRotation = false;
+    }
 
     void InstantRotation()
     {
@@ -52,16 +61,25 @@ public class Player : MonoBehaviour
         transform.rotation = Quaternion.RotateTowards(transform.rotation, _lookRotation, 8);
     }
 
-    void MoveToPoint()
+    public void Attack(Enemy enemy)
     {
-        var mouse = Mouse.current;
-        Ray ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
-        RaycastHit hit;
+        // Assign
+        enemy.TakeDamage(physDamage, magicDamage);
+    }
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, groundLayer))
+    public void TakeDamage()
+    {
+        if (health <= 0)
         {
-            agent.SetDestination(hit.point);
+            Die();
         }
     }
+
+    private void Die()
+    {
+        Destroy(gameObject);
+    }
+
+    
     #endregion
 }

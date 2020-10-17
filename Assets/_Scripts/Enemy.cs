@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 using Btkalman.Util;
+using cakeslice;
 
 public class Enemy : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class Enemy : MonoBehaviour
     private NavMeshAgent agent;
     [SerializeField] private LayerMask towerLayer;
     private Transform endPathTransform;
+    private cakeslice.Outline outline;
 
     [Header("Enemy Statistics")]
     private EnemyType enemyType;
@@ -66,6 +68,7 @@ public class Enemy : MonoBehaviour
     {
         // GetComponents in Awake.
         agent = GetComponent<NavMeshAgent>();
+        outline = GetComponent<cakeslice.Outline>();
     }
 
     // OnEnable is called before Start
@@ -102,11 +105,21 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        CheckPath();
+        
     }
     #endregion
 
     #region Functions
+
+    public void HighlightEnemy()
+    {
+        outline.eraseRenderer = false;
+    }
+
+    public void UnhighlightEnemy()
+    {
+        outline.eraseRenderer = true;
+    }
 
     private void GoToEnd()
     {
@@ -133,6 +146,7 @@ public class Enemy : MonoBehaviour
         moveSpeed = 3.5f;
         agent.speed = moveSpeed;
         canAttack = true;
+        UnhighlightEnemy();
     }
 
     private void EnemySpawner_EnemySpawned(Transform endPathTransform)
@@ -145,7 +159,7 @@ public class Enemy : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireSphere(transform.position, Mathf.Min(agent.radius * 10, agent.radius + 10));
+        //Gizmos.DrawWireSphere(transform.position, Mathf.Min(agent.radius * 10, agent.radius + 10));
     }
 
 
