@@ -26,6 +26,16 @@ public class Player : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
     }
 
+    void OnEnable()
+    {
+        MouseManager.Instance.PlayerMoved += MovePlayer;
+    }
+    
+    void OnDisable()
+    {
+        MouseManager.Instance.PlayerMoved -= MovePlayer;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -80,6 +90,10 @@ public class Player : MonoBehaviour
         Destroy(gameObject);
     }
 
-    
+    private void MovePlayer(Vector3 position)
+    {
+        agent.SetDestination(position);
+    }
+
     #endregion
 }

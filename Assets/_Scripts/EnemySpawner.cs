@@ -45,9 +45,10 @@ public class EnemySpawner : MonoBehaviour
 
     private void Update()
     {
+        // Temp test
         var keyboard = Keyboard.current;
         if (keyboard == null)
-            return; // No gamepad connected.
+            return; // No keyboard connected.
 
         if (keyboard.enterKey.wasPressedThisFrame)
         {
