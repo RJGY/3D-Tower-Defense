@@ -9,13 +9,15 @@ public class Player : MonoBehaviour
     #region Variables
     [Header("NavMesh Properties")]
     private NavMeshAgent agent;
-    
+
 
     [Header("Combat Properties")]
+    private Enemy currentEnemy;
     private float health;
     private float maxHealth;
     private float physDamage;
     private float magicDamage;
+    private float attackRange;
     #endregion
 
     #region Monobehaviour
@@ -29,8 +31,11 @@ public class Player : MonoBehaviour
     void OnEnable()
     {
         MouseManager.Instance.PlayerMoved += MovePlayer;
+        MouseManager.Instance.PlayerAttacked += Attack;
     }
+
     
+
     void OnDisable()
     {
         MouseManager.Instance.PlayerMoved -= MovePlayer;
@@ -61,6 +66,7 @@ public class Player : MonoBehaviour
         health = maxHealth;
         physDamage = 5;
         magicDamage = 5;
+        attackRange = 1;
         agent.updateRotation = false;
     }
 
@@ -71,14 +77,32 @@ public class Player : MonoBehaviour
         transform.rotation = Quaternion.RotateTowards(transform.rotation, _lookRotation, 8);
     }
 
-    public void Attack(Enemy enemy)
+    private void Attack(Enemy enemy)
     {
-        // Assign
-        enemy.TakeDamage(physDamage, magicDamage);
+        // Player pathfind to enemy
+        if (agent.destination != enemy.transform.position)
+        {
+            agent.SetDestination(enemy.transform.position);
+        }
+
+        // Player is in range of enemy
+        if (Vector3.Distance(transform.position, enemy.transform.position) <= attackRange)
+        {
+            // Player does animation to attack
+
+            // Player hits enemy.
+            Debug.Log("The player has attacked " + enemy.name);
+            enemy.TakeDamage(physDamage, magicDamage);
+
+            // Player attack cooldown
+
+        }
     }
 
-    public void TakeDamage()
+    public void TakeDamage(float physDamage, float magicDamage)
     {
+
+
         if (health <= 0)
         {
             Die();

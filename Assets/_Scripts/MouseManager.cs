@@ -11,6 +11,8 @@ public class MouseManager : MonoBehaviour
     public event MovePlayer PlayerMoved;
     public event MovePlayer BuiltTurret;
     public event MovePlayer NodeSelected;
+    public delegate void AttackPlayer(Enemy enemy);
+    public event AttackPlayer PlayerAttacked;
     public delegate void NodeSelect();
     public event NodeSelect NodeDeselected;
 
@@ -20,6 +22,7 @@ public class MouseManager : MonoBehaviour
     private Mouse mouse;
     [SerializeField] private LayerMask nodeLayer;
     [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask enemyLayer;
     #endregion
 
 
@@ -33,7 +36,7 @@ public class MouseManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Multiple GameManagers in scene.");
+            Debug.LogError("Multiple MouseManagers in scene.");
         }
 
     }
@@ -50,7 +53,10 @@ public class MouseManager : MonoBehaviour
 
         if (mouse.rightButton.wasPressedThisFrame)
         {
-            MoveToPoint();
+            if (!PlayerAttack())
+            {
+                MoveToPoint();
+            }
         }
 
         if (mouse.leftButton.wasPressedThisFrame)
@@ -93,5 +99,19 @@ public class MouseManager : MonoBehaviour
         {
             BuiltTurret?.Invoke(hit.transform.position);
         }
+    }
+
+    private bool PlayerAttack()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, enemyLayer))
+        {
+            PlayerAttacked?.Invoke(hit.transform.GetComponent<Enemy>());
+            return true;
+        }
+
+        return false;
     }
 }

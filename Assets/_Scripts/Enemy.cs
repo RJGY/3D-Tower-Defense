@@ -229,6 +229,9 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(float physDamage, float magicDamage)
     {
+        health -= physDamage;
+        health -= magicDamage;
+
         // This needs to be an event later on.
         if (health <= 0)
         {
