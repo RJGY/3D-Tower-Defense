@@ -44,6 +44,7 @@ public class MouseManager : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log("LMFAO");
         mouse = Mouse.current;
     }
 

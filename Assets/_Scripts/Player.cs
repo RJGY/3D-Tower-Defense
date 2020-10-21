@@ -18,6 +18,8 @@ public class Player : MonoBehaviour
     private float physDamage;
     private float magicDamage;
     private float attackRange;
+    private float attackRate;
+    private bool canAttack;
     #endregion
 
     #region Monobehaviour
@@ -54,6 +56,11 @@ public class Player : MonoBehaviour
         {
             InstantRotation();
         }
+
+        if (currentEnemy != null)
+        {
+            Attack(currentEnemy);
+        }
     }
 
     #endregion
@@ -64,8 +71,8 @@ public class Player : MonoBehaviour
     {
         maxHealth = 100;
         health = maxHealth;
-        physDamage = 5;
-        magicDamage = 5;
+        physDamage = 1;
+        magicDamage = 1;
         attackRange = 1;
         agent.updateRotation = false;
     }
@@ -79,10 +86,15 @@ public class Player : MonoBehaviour
 
     private void Attack(Enemy enemy)
     {
-        // Player pathfind to enemy
-        if (agent.destination != enemy.transform.position)
+        if (currentEnemy == null)
         {
-            agent.SetDestination(enemy.transform.position);
+            currentEnemy = enemy;
+        }
+
+        // Player pathfind to enemy
+        if (agent.destination != currentEnemy.transform.position)
+        {
+            agent.SetDestination(currentEnemy.transform.position);
         }
 
         // Player is in range of enemy
@@ -91,8 +103,8 @@ public class Player : MonoBehaviour
             // Player does animation to attack
 
             // Player hits enemy.
-            Debug.Log("The player has attacked " + enemy.name);
-            enemy.TakeDamage(physDamage, magicDamage);
+            Debug.Log("The player has attacked " + currentEnemy.name);
+            currentEnemy.TakeDamage(physDamage, magicDamage);
 
             // Player attack cooldown
 
@@ -120,4 +132,18 @@ public class Player : MonoBehaviour
     }
 
     #endregion
+
+    private IEnumerator AttackCooldown()
+    {
+        if (!canAttack)
+        {
+            yield return new WaitForSeconds(attackRate);
+            canAttack = true;
+        }
+        else
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+    }
 }

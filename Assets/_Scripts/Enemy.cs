@@ -37,7 +37,7 @@ public class Enemy : MonoBehaviour
     private float magicResist;
     private int livesWorth;
     private float goldReward;
-    private Transform targetedTurret;
+    private Transform targetedTransform;
 
     [Header("Enemy UI")]
     private Image healthImage;
@@ -165,28 +165,28 @@ public class Enemy : MonoBehaviour
 
     private void Attack()
     {
-        // Find closest turret
-        if (targetedTurret == null)
-            targetedTurret = FindClosestTower();
+        // Find closest enemy
+        if (targetedTransform == null)
+            targetedTransform = FindClosestTower();
 
         // Pathfind towards turret
-        if (agent.destination != targetedTurret.transform.position)
+        if (agent.destination != targetedTransform.transform.position)
         {
-            agent.SetDestination(targetedTurret.transform.position);
+            agent.SetDestination(targetedTransform.transform.position);
         }
         
         // Attack closest turret.
-        if (Vector3.Distance(transform.position, targetedTurret.position) < attackRange)
+        if (Vector3.Distance(transform.position, targetedTransform.position) < attackRange)
         {
-            Debug.Log("I am attempting to attack " + targetedTurret.name);
+            Debug.Log("I am attempting to attack " + targetedTransform.name);
             if (canAttack)
             {
-                Debug.Log("I have attacked " + targetedTurret.name, targetedTurret);
+                Debug.Log("I have attacked " + targetedTransform.name, targetedTransform);
 
                 // Deal Damage
                 // Damage should be dealt through animation event.
                 Debug.Log("I dealt " + attackDamage + " damage.");
-                Destroy(targetedTurret.gameObject);
+                Destroy(targetedTransform.gameObject);
 
                 // Attack reset.
 
@@ -276,8 +276,10 @@ public class Enemy : MonoBehaviour
             yield return new WaitForSeconds(1 / attackRate);
             canAttack = true;
         }
-        
-        yield return new WaitForEndOfFrame();
+        else
+        {
+            yield return new WaitForEndOfFrame();
+        }
     }
 
     

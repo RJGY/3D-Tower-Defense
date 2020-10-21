@@ -31,8 +31,6 @@ public class Node : MonoBehaviour
         MouseManager.Instance.NodeSelected += NodeSelected;
     }
 
-
-
     private void OnDisable()
     {
         MouseManager.Instance.BuiltTurret -= BuildTurret;
@@ -41,6 +39,7 @@ public class Node : MonoBehaviour
     }
 
     #endregion
+
     private void BuildTurret(Vector3 position)
     {
         if (childTurret == null)
