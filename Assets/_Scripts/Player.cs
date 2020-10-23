@@ -32,8 +32,7 @@ public class Player : MonoBehaviour
 
     void OnEnable()
     {
-        MouseManager.Instance.PlayerMoved += MovePlayer;
-        MouseManager.Instance.PlayerAttacked += Attack;
+        
     }
 
     
@@ -46,6 +45,9 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        MouseManager.Instance.PlayerMoved += MovePlayer;
+        MouseManager.Instance.PlayerAttacked += Attack;
+
         AssignStats();
     }
 

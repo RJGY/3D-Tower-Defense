@@ -25,7 +25,6 @@ public class MouseManager : MonoBehaviour
     [SerializeField] private LayerMask enemyLayer;
     #endregion
 
-
     #region Singleton
     public static MouseManager Instance = null;
     private void Awake()
@@ -39,12 +38,12 @@ public class MouseManager : MonoBehaviour
             Debug.LogError("Multiple MouseManagers in scene.");
         }
 
+        
     }
     #endregion
 
     private void Start()
     {
-        Debug.Log("LMFAO");
         mouse = Mouse.current;
     }
 
@@ -101,7 +100,7 @@ public class MouseManager : MonoBehaviour
             BuiltTurret?.Invoke(hit.transform.position);
         }
     }
-
+    
     private bool PlayerAttack()
     {
         Ray ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
@@ -115,4 +114,5 @@ public class MouseManager : MonoBehaviour
 
         return false;
     }
+    
 }

@@ -16,19 +16,23 @@ public class Node : MonoBehaviour
     private void Awake()
     {
         outline = GetComponent<Outline>();
+
+        
     }
 
     // Start is called before the first frame update
     private void Start()
     {
+        MouseManager.Instance.BuiltTurret += BuildTurret;
+        MouseManager.Instance.NodeDeselected += DeselectNode;
+        MouseManager.Instance.NodeSelected += NodeSelected;
+
         outline.eraseRenderer = true;
     }
 
     private void OnEnable()
     {
-        MouseManager.Instance.BuiltTurret += BuildTurret;
-        MouseManager.Instance.NodeDeselected += DeselectNode;
-        MouseManager.Instance.NodeSelected += NodeSelected;
+        
     }
 
     private void OnDisable()
