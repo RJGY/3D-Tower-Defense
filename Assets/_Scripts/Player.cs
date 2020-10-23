@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
     #region Variables
     [Header("NavMesh Properties")]
     private NavMeshAgent agent;
+    private Vector2 lastPosition;
 
 
     [Header("Combat Properties")]
@@ -20,6 +21,7 @@ public class Player : MonoBehaviour
     private float attackRange;
     private float attackRate;
     private bool canAttack;
+    private Animator animator;
     #endregion
 
     #region Monobehaviour
@@ -28,6 +30,7 @@ public class Player : MonoBehaviour
     {
         // GetComponents in Awake.
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
     }
 
     void OnEnable()
@@ -63,6 +66,15 @@ public class Player : MonoBehaviour
         {
             Attack(currentEnemy);
         }
+        else if (currentEnemy == null && new Vector2(agent.destination.x, agent.destination.z) != lastPosition)
+        {
+            StopAttackingNullEnemy();
+        }
+
+        if (animator.GetBool("isAttacking"))
+        {
+            agent.SetDestination(transform.position);
+        }
     }
 
     #endregion
@@ -76,7 +88,17 @@ public class Player : MonoBehaviour
         physDamage = 1;
         magicDamage = 1;
         attackRange = 1;
+        attackRate = 0.5f;
         agent.updateRotation = false;
+        canAttack = true;
+    }
+
+    void StopAttackingNullEnemy()
+    {
+        Debug.Log(agent.destination);
+        Debug.Log(lastPosition);
+        agent.SetDestination(transform.position);
+        lastPosition = new Vector2(transform.position.x, transform.position.z);
     }
 
     void InstantRotation()
@@ -88,28 +110,46 @@ public class Player : MonoBehaviour
 
     private void Attack(Enemy enemy)
     {
+
         if (currentEnemy == null)
         {
             currentEnemy = enemy;
         }
 
-        // Player pathfind to enemy
-        if (agent.destination != currentEnemy.transform.position)
-        {
-            agent.SetDestination(currentEnemy.transform.position);
-        }
-
         // Player is in range of enemy
         if (Vector3.Distance(transform.position, enemy.transform.position) <= attackRange)
         {
-            // Player does animation to attack
+            Debug.Log("I am in range of the enemy and i am attempting to attack");
+            if (canAttack)
+            {
+                // Player stops to attack.
+                agent.SetDestination(transform.position);
 
-            // Player hits enemy.
-            Debug.Log("The player has attacked " + currentEnemy.name);
-            currentEnemy.TakeDamage(physDamage, magicDamage);
+                // Player does animation to attack
+                animator.SetBool("isAttacking", false);
 
-            // Player attack cooldown
+                // Player hits enemy.
+                Debug.Log("The player has attacked " + currentEnemy.name);
+                currentEnemy.TakeDamage(physDamage, magicDamage);
+                canAttack = false;
 
+                // Player attack cooldown
+                StartCoroutine(AttackCooldown());
+            }
+            else
+            {
+                // Still in attack cooldown
+
+            }
+
+        }
+        else
+        {
+            // Player pathfind to enemy
+            if (agent.destination != currentEnemy.transform.position)
+            {
+                agent.SetDestination(currentEnemy.transform.position);
+            }
         }
     }
 
@@ -131,6 +171,8 @@ public class Player : MonoBehaviour
     private void MovePlayer(Vector3 position)
     {
         agent.SetDestination(position);
+        lastPosition = new Vector2(agent.destination.x, agent.destination.z);
+        currentEnemy = null;
     }
 
     #endregion
@@ -141,6 +183,7 @@ public class Player : MonoBehaviour
         {
             yield return new WaitForSeconds(attackRate);
             canAttack = true;
+            animator.SetBool("isAttacking", false);
         }
         else
         {

@@ -38,7 +38,6 @@ public class MouseManager : MonoBehaviour
             Debug.LogError("Multiple MouseManagers in scene.");
         }
 
-        
     }
     #endregion
 
