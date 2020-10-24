@@ -73,6 +73,7 @@ public class Player : MonoBehaviour
 
         if (animator.GetBool("isAttacking"))
         {
+            // Player stops to attack.
             agent.SetDestination(transform.position);
         }
     }
@@ -122,11 +123,8 @@ public class Player : MonoBehaviour
             Debug.Log("I am in range of the enemy and i am attempting to attack");
             if (canAttack)
             {
-                // Player stops to attack.
-                agent.SetDestination(transform.position);
-
                 // Player does animation to attack
-                animator.SetBool("isAttacking", false);
+                animator.SetBool("isAttacking", true);
 
                 // Player hits enemy.
                 Debug.Log("The player has attacked " + currentEnemy.name);
