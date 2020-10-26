@@ -60,6 +60,11 @@ public class Player : MonoBehaviour
         if (agent.velocity.sqrMagnitude > Mathf.Epsilon)
         {
             InstantRotation();
+            animator.SetBool("isRunning", true);
+        }
+        else
+        {
+            animator.SetBool("isRunning", false);
         }
 
         if (currentEnemy != null)
@@ -107,6 +112,8 @@ public class Player : MonoBehaviour
         var _lookRotation = Quaternion.LookRotation(agent.velocity.normalized);
 
         transform.rotation = Quaternion.RotateTowards(transform.rotation, _lookRotation, 8);
+
+        
     }
 
     private void Attack(Enemy enemy)
@@ -125,6 +132,7 @@ public class Player : MonoBehaviour
             {
                 // Player does animation to attack
                 animator.SetBool("isAttacking", true);
+                animator.SetTrigger("attack");
 
                 // Player hits enemy.
                 Debug.Log("The player has attacked " + currentEnemy.name);
