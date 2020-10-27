@@ -16,8 +16,8 @@ public class Player : MonoBehaviour
     private Enemy currentEnemy;
     private float health;
     private float maxHealth;
-    private float physDamage;
-    private float magicDamage;
+    private float m_physDamage;
+    private float m_magicDamage;
     private float attackRange;
     private float attackRate;
     private bool canAttack;
@@ -91,8 +91,8 @@ public class Player : MonoBehaviour
     {
         maxHealth = 100;
         health = maxHealth;
-        physDamage = 1;
-        magicDamage = 1;
+        m_physDamage = 1;
+        m_magicDamage = 1;
         attackRange = 1;
         attackRate = 0.5f;
         agent.updateRotation = false;
@@ -132,11 +132,10 @@ public class Player : MonoBehaviour
             {
                 // Player does animation to attack
                 animator.SetBool("isAttacking", true);
-                animator.SetTrigger("attack");
 
                 // Player hits enemy.
                 Debug.Log("The player has attacked " + currentEnemy.name);
-                currentEnemy.TakeDamage(physDamage, magicDamage);
+                currentEnemy.TakeDamage(m_physDamage, m_magicDamage);
                 canAttack = false;
 
                 // Player attack cooldown
@@ -161,7 +160,8 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(float physDamage, float magicDamage)
     {
-
+        health -= physDamage;
+        health -= magicDamage;
 
         if (health <= 0)
         {
