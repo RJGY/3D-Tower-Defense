@@ -2,19 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public class MouseManager : MonoBehaviour
 {
     #region Events
-    public delegate void MovePlayer(Vector3 position);
-    public event MovePlayer PlayerMoved;
-    public event MovePlayer BuiltTurret;
-    public event MovePlayer NodeSelected;
+    public delegate void Position(Vector3 position);
+    public event Position PlayerMoved;
+    public event Position BuiltTurret;
+    public event Position NodeSelected;
+    public event Position EnemySelected;
+    public event Position TowerSelected;
     public delegate void AttackPlayer(Enemy enemy);
     public event AttackPlayer PlayerAttacked;
-    public delegate void NodeSelect();
-    public event NodeSelect NodeDeselected;
+    public delegate void Deselect();
+    public event Deselect NodeDeselected;
+    public event Deselect EnemyDeselected;
+    public event Deselect TowerDeselected;
+
 
     #endregion
 
@@ -23,6 +29,7 @@ public class MouseManager : MonoBehaviour
     [SerializeField] private LayerMask nodeLayer;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private LayerMask towerLayer;
     #endregion
 
     #region Singleton
@@ -48,7 +55,22 @@ public class MouseManager : MonoBehaviour
 
     void Update()
     {
-        CheckIfNodeMouseHover();
+        if (CheckIfEnemyHover())
+        {
+            NodeDeselected?.Invoke();
+            Debug.Log("Hovering enemy");
+        }
+        else if (CheckIfTowerHover())
+        {
+            NodeDeselected?.Invoke();
+            Debug.Log("Hovering Tower");
+        }
+        else
+        {
+            CheckIfNodeMouseHover();
+            Debug.Log("Hovering Node");
+        }
+        
 
         if (mouse.rightButton.wasPressedThisFrame)
         {
@@ -76,6 +98,38 @@ public class MouseManager : MonoBehaviour
         {
             NodeSelected?.Invoke(hit.transform.position);
         }
+    }
+
+    bool CheckIfEnemyHover()
+    {
+        EnemyDeselected?.Invoke();
+
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
+
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, enemyLayer))
+        {
+            EnemySelected?.Invoke(hit.transform.position);
+            return true;
+        }
+
+        return false;
+    }
+
+    bool CheckIfTowerHover()
+    {
+        TowerDeselected?.Invoke();
+
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
+
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, towerLayer))
+        {
+            TowerSelected?.Invoke(hit.transform.position);
+            return true;
+        }
+
+        return false;
     }
 
     void MoveToPoint()
