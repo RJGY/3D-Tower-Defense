@@ -3444,6 +3444,9 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 6144
+  towerLayer:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!1001 &1207617781
 PrefabInstance:
   m_ObjectHideFlags: 0
