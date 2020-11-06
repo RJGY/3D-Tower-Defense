@@ -71,18 +71,22 @@ public class Enemy : MonoBehaviour
         outline = GetComponent<cakeslice.Outline>();
     }
 
-    // OnEnable is called before Start
     private void OnEnable()
     {
+        // Subscribe events.
+        EnemySpawner.instance.EnemySpawned += EnemySpawner_EnemySpawned;
+
         
     }
-
-    
 
     private void OnDisable()
     {
         // This is just incase the event does not unsubscribe when it triggers.
         EnemySpawner.instance.EnemySpawned -= EnemySpawner_EnemySpawned;
+
+        // Unsubscrive Events
+        MouseManager.Instance.EnemyDeselected -= EnemyDeselected;
+        MouseManager.Instance.EnemySelected -= EnemySelected;
     }
 
     private void OnDestroy()
@@ -94,17 +98,16 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+        // Subscribe events
+        MouseManager.Instance.EnemyDeselected += EnemyDeselected;
+        MouseManager.Instance.EnemySelected += EnemySelected;
+
         // Call functions.
         GoToEnd();
         AssignStats();
 
         // Call Coroutines.
         StartCoroutine(CheckPath());
-
-        // Subscribe event.
-        EnemySpawner.instance.EnemySpawned += EnemySpawner_EnemySpawned;
-        MouseManager.Instance.EnemyDeselected += EnemyDeselected;
-        MouseManager.Instance.EnemySelected += EnemySelected;
     }
 
 
@@ -181,8 +184,37 @@ public class Enemy : MonoBehaviour
         //Gizmos.DrawWireSphere(transform.position, Mathf.Min(agent.radius * 10, agent.radius + 10));
     }
 
+    private void AttackPlayer()
+    {
+        Transform targetedTransform = FindObjectOfType<Player>().transform;
+        if (agent.destination != targetedTransform.transform.position)
+        {
+            agent.SetDestination(targetedTransform.transform.position);
+        }
 
-    private void Attack()
+        // Attack player.
+        if (Vector3.Distance(transform.position, targetedTransform.position) < attackRange)
+        {
+            Debug.Log("I am attempting to attack " + targetedTransform.name);
+            if (canAttack)
+            {
+                Debug.Log("I have attacked " + targetedTransform.name, targetedTransform);
+
+                // Deal Damage
+                // Damage should be dealt through animation event.
+                Debug.Log("I dealt " + attackDamage + " damage.");
+                //Destroy(targetedTransform.gameObject);
+
+                // Attack reset.
+
+                canAttack = false;
+                StartCoroutine(AttackCooldown());
+                GoToEnd();
+            }
+        }
+    }
+
+    private void AttackTurret()
     {
         // Find closest enemy
         if (targetedTransform == null)
@@ -281,7 +313,7 @@ public class Enemy : MonoBehaviour
         else if (!agent.pathPending && (!agent.hasPath || agent.velocity.sqrMagnitude == 0f))
         {
             // Attack
-            Attack();
+            AttackTurret();
         }
 
         // Restart Coroutine.
