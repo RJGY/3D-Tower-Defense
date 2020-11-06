@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3671836785981353742}
   - component: {fileID: 4701155965416958024}
   - component: {fileID: 3965552147976895904}
+  - component: {fileID: 7827509108024118358}
   m_Layer: 10
   m_Name: TestObstacle
   m_TagString: Untagged
@@ -123,3 +124,17 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &7827509108024118358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2856840573212652292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbf3575480402db40813e763382412fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: 2
+  eraseRenderer: 1

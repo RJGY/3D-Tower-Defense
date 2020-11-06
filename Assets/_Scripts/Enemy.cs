@@ -74,9 +74,10 @@ public class Enemy : MonoBehaviour
     // OnEnable is called before Start
     private void OnEnable()
     {
-        // Subscribe event.
-        EnemySpawner.instance.EnemySpawned += EnemySpawner_EnemySpawned;
+        
     }
+
+    
 
     private void OnDisable()
     {
@@ -99,6 +100,11 @@ public class Enemy : MonoBehaviour
 
         // Call Coroutines.
         StartCoroutine(CheckPath());
+
+        // Subscribe event.
+        EnemySpawner.instance.EnemySpawned += EnemySpawner_EnemySpawned;
+        MouseManager.Instance.EnemyDeselected += EnemyDeselected;
+        MouseManager.Instance.EnemySelected += EnemySelected;
     }
 
 
@@ -119,6 +125,19 @@ public class Enemy : MonoBehaviour
     public void UnhighlightEnemy()
     {
         outline.eraseRenderer = true;
+    }
+
+    private void EnemySelected(Vector3 position)
+    {
+        if (position == transform.position)
+        {
+            HighlightEnemy();
+        }
+    }
+
+    private void EnemyDeselected()
+    {
+        UnhighlightEnemy();
     }
 
     private void GoToEnd()
