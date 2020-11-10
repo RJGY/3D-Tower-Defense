@@ -5,6 +5,8 @@ using UnityEngine.AI;
 using UnityEngine.UI;
 using Btkalman.Util;
 using cakeslice;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 public class Enemy : MonoBehaviour
 {
@@ -26,10 +28,9 @@ public class Enemy : MonoBehaviour
     [Header("Enemy Attack Variables")]
     [SerializeField] private float attackRange;
     private float attackDamage;
+    private float magicDamage;
     private float attackRate;
     private bool canAttack;
-
-
     private float maxHealth;
     private float health;
     private float moveSpeed;
@@ -75,8 +76,6 @@ public class Enemy : MonoBehaviour
     {
         // Subscribe events.
         EnemySpawner.instance.EnemySpawned += EnemySpawner_EnemySpawned;
-
-        
     }
 
     private void OnDisable()
@@ -186,7 +185,33 @@ public class Enemy : MonoBehaviour
 
     private void AttackPlayer()
     {
-        Transform targetedTransform = FindObjectOfType<Player>().transform;
+        // Find all players
+        Transform[] players = FindObjectsOfType<Player>().Select(player => player.transform).ToArray(); ;
+
+        // Assign player to targetedTransform.
+        if (players.Length == 1)
+        {
+            targetedTransform = players[0].transform;
+        }
+        else
+        {
+            foreach (Transform player in players)
+            {
+                if (targetedTransform == null)
+                {
+                    targetedTransform = player;
+                }
+                else
+                {
+                    if (Vector3.Distance(player.position, transform.position) < Vector3.Distance(transform.position, targetedTransform.position))
+                    {
+                        targetedTransform = player;
+                    }
+                }
+            }
+        }
+
+        // Pathfind to player.
         if (agent.destination != targetedTransform.transform.position)
         {
             agent.SetDestination(targetedTransform.transform.position);
@@ -203,10 +228,11 @@ public class Enemy : MonoBehaviour
                 // Deal Damage
                 // Damage should be dealt through animation event.
                 Debug.Log("I dealt " + attackDamage + " damage.");
-                //Destroy(targetedTransform.gameObject);
+                Player player = FindObjectsOfType<Player>().Where(p => p.transform.position == targetedTransform.position).FirstOrDefault();
+                player.TakeDamage(attackDamage, magicDamage);
 
                 // Attack reset.
-
+                targetedTransform = null;
                 canAttack = false;
                 StartCoroutine(AttackCooldown());
                 GoToEnd();
@@ -238,6 +264,7 @@ public class Enemy : MonoBehaviour
                 // Damage should be dealt through animation event.
                 Debug.Log("I dealt " + attackDamage + " damage.");
                 Destroy(targetedTransform.gameObject);
+                targetedTransform = null;
 
                 // Attack reset.
 
