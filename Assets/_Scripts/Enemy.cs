@@ -6,7 +6,6 @@ using UnityEngine.UI;
 using Btkalman.Util;
 using cakeslice;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 public class Enemy : MonoBehaviour
 {
@@ -263,11 +262,12 @@ public class Enemy : MonoBehaviour
                 // Deal Damage
                 // Damage should be dealt through animation event.
                 Debug.Log("I dealt " + attackDamage + " damage.");
-                Destroy(targetedTransform.gameObject);
-                targetedTransform = null;
+                //Destroy(targetedTransform.gameObject);
+                Turrets turret = FindObjectsOfType<Turrets>().Where(t => t.transform.position == targetedTransform.position).FirstOrDefault();
+                turret.TakeDamage(attackDamage, magicDamage);
 
                 // Attack reset.
-
+                targetedTransform = null;
                 canAttack = false;
                 StartCoroutine(AttackCooldown());
                 GoToEnd();

@@ -133,7 +133,7 @@ public class Turrets : MonoBehaviour
         // Fix
     }
 
-    protected void TakeDamage(float pDamage, float mDamage, float tDamage, float pPen, float mPen)
+    public void TakeDamage(float physDamage, float magicDamage)
     {
 
     }
