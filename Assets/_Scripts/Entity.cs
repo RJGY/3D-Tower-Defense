@@ -40,7 +40,7 @@ public class Entity : MonoBehaviour
     
     public void TakeDamage(float physDamage, float magicDamage)
     {
-        health -= (physDamage/(1 + armour/100)) + (magicDamage/(1 + magicResist/100));
+        health -= (physDamage/((100 + armour)/100)) + (magicDamage/((100 + magicResist)/100));
 
         if (health <= 0)
         {
