@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Turrets : MonoBehaviour
+public class Turrets : Entity
 {
     #region Events
 
@@ -128,23 +128,9 @@ public class Turrets : MonoBehaviour
         return lastEnemy;
     }
 
-    protected void Attack()
-    {
-        // Fix
-    }
-
-    public void TakeDamage(float physDamage, float magicDamage)
-    {
-
-    }
     #endregion
 
     #region Coroutines
-
-    protected IEnumerator AttackCooldown()
-    {
-        yield return new WaitForSeconds(1 / attackSpeed);
-    }
 
     #endregion
 }

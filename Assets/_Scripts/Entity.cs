@@ -10,27 +10,18 @@ public class Entity : MonoBehaviour
     private float magicDamage;
     private float attackRate;
     private bool canAttack;
+    private bool isAttackReseting;
     private float maxHealth;
     private float health;
     private float armour;
     private float magicResist;
-    private Transform targetedTransform;
 
-    // Start is called before the first frame update
-    void Start()
+    #region Functions
+
+    protected void AssignStats()
     {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    protected IEnumerator AttackCooldown()
-    {
-        yield return new WaitForEndOfFrame();
+        health = maxHealth;
+        canAttack = true;
     }
 
     protected void DealDamage(Entity enemy)
@@ -50,7 +41,31 @@ public class Entity : MonoBehaviour
 
     protected void Die()
     {
-        //Destroy gameobject
+        // Destroy gameobject.
         Destroy(gameObject);
     }
+
+    private void Attack()
+    {
+        
+    }
+
+    #endregion
+
+    #region Coroutines
+    protected IEnumerator AttackCooldown()
+    {
+        if (!isAttackReseting && !canAttack)
+        {
+            isAttackReseting = true;
+            yield return new WaitForSeconds(attackRate);
+            canAttack = true;
+            isAttackReseting = false;
+        }
+        else
+        {
+            yield return new WaitForEndOfFrame();
+        }
+    }
+    #endregion
 }

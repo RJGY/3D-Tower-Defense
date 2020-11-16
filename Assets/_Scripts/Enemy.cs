@@ -7,7 +7,7 @@ using Btkalman.Util;
 using cakeslice;
 using System.Linq;
 
-public class Enemy : MonoBehaviour
+public class Enemy : Entity
 {
     #region Events
 
@@ -23,6 +23,8 @@ public class Enemy : MonoBehaviour
     [Header("Enemy Statistics")]
     private EnemyType enemyType;
     private EnemySpecies enemyArt;
+    private int livesWorth;
+    private float goldReward;
 
     [Header("Enemy Attack Variables")]
     [SerializeField] private float attackRange;
@@ -35,8 +37,7 @@ public class Enemy : MonoBehaviour
     private float moveSpeed;
     private float armour;
     private float magicResist;
-    private int livesWorth;
-    private float goldReward;
+    
     private Transform targetedTransform;
 
     [Header("Enemy UI")]
@@ -154,7 +155,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private void AssignStats()
+    private void AssignStats2()
     {
         // Assign Variables
         // Put this into a switch statement later.
@@ -264,7 +265,7 @@ public class Enemy : MonoBehaviour
                 Debug.Log("I dealt " + attackDamage + " damage.");
                 //Destroy(targetedTransform.gameObject);
                 Turrets turret = FindObjectsOfType<Turrets>().Where(t => t.transform.position == targetedTransform.position).FirstOrDefault();
-                turret.TakeDamage(attackDamage, magicDamage);
+                
 
                 // Attack reset.
                 targetedTransform = null;
@@ -305,19 +306,7 @@ public class Enemy : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public void TakeDamage(float physDamage, float magicDamage)
-    {
-        health -= physDamage;
-        health -= magicDamage;
-
-        // This needs to be an event later on.
-        if (health <= 0)
-        {
-            Die();
-        }
-    }
-
-    private void Die()
+    private new void Die()
     {
         // Give gold reward to gamemanager.
         
@@ -347,18 +336,6 @@ public class Enemy : MonoBehaviour
         StartCoroutine(CheckPath());
     }
 
-    private IEnumerator AttackCooldown()
-    {
-        if (!canAttack)
-        {
-            yield return new WaitForSeconds(1 / attackRate);
-            canAttack = true;
-        }
-        else
-        {
-            yield return new WaitForEndOfFrame();
-        }
-    }
 
     
     #endregion
