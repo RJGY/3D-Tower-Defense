@@ -11,23 +11,15 @@ public class Turrets : Entity
 
     #region Variables
 
-    [Header("Turret Combat Variables")]
-    protected float health;
-    protected float attackRange;
-    protected float attackSpeed; // Measured in attacks per second.
-    protected float attackDamage;
-    protected float magicDamage;
-    protected float pureDamage;
-    protected float armourPenetration;
-    protected float magicResistPenetration;
-    protected float projectileSpeed;
+    [Header("Turret Variables")]
     protected TurretType turretType;
     protected AttackType attackType;
-    protected float armour;
-    protected float magicresist;
-    protected float worth;
-    protected bool buffed;
+    protected bool isBuffed;
     protected float currentBuffValue;
+
+    [Header("Turret GameManager Variables")]
+    protected float worth;
+    
 
     [Header("Turret Effect Varaibles")]
     protected Outline outline;

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
-public class Player : MonoBehaviour
+public class Player : Entity
 {
     #region Variables
     [Header("NavMesh Properties")]
@@ -14,13 +14,6 @@ public class Player : MonoBehaviour
 
     [Header("Combat Properties")]
     private Enemy currentEnemy;
-    private float health;
-    private float maxHealth;
-    private float m_physDamage;
-    private float m_magicDamage;
-    private float attackRange;
-    private float attackRate;
-    private bool canAttack;
     private Animator animator;
     #endregion
 
@@ -87,14 +80,14 @@ public class Player : MonoBehaviour
 
     #region Functions
 
-    private void AssignStats()
+    private void AssignStats2()
     {
         maxHealth = 100;
         health = maxHealth;
-        m_physDamage = 1;
-        m_magicDamage = 1;
+        physicalDamage = 1;
+        magicDamage = 1;
         attackRange = 1;
-        attackRate = 0.5f;
+        attackSpeed = 0.5f;
         agent.updateRotation = false;
         canAttack = true;
     }
@@ -135,7 +128,7 @@ public class Player : MonoBehaviour
 
                 // Player hits enemy.
                 Debug.Log("The player has attacked " + currentEnemy.name);
-                currentEnemy.TakeDamage(m_physDamage, m_magicDamage);
+                currentEnemy.TakeDamage(physicalDamage, magicDamage);
                 canAttack = false;
 
                 // Player attack cooldown
@@ -158,22 +151,6 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float physDamage, float magicDamage)
-    {
-        health -= physDamage;
-        health -= magicDamage;
-
-        if (health <= 0)
-        {
-            Die();
-        }
-    }
-
-    private void Die()
-    {
-        Destroy(gameObject);
-    }
-
     private void MovePlayer(Vector3 position)
     {
         agent.SetDestination(position);
@@ -182,19 +159,4 @@ public class Player : MonoBehaviour
     }
 
     #endregion
-
-    private IEnumerator AttackCooldown()
-    {
-        if (!canAttack)
-        {
-            yield return new WaitForSeconds(attackRate);
-            canAttack = true;
-            animator.SetBool("isAttacking", false);
-        }
-        else
-        {
-            yield return new WaitForEndOfFrame();
-        }
-
-    }
 }

@@ -5,16 +5,19 @@ using UnityEngine;
 public class Entity : MonoBehaviour
 {
     [Header("Combat Variables")]
-    [SerializeField] private float attackRange;
-    private float physicalDamage;
-    private float magicDamage;
-    private float attackRate;
-    private bool canAttack;
-    private bool isAttackReseting;
-    private float maxHealth;
-    private float health;
-    private float armour;
-    private float magicResist;
+    protected float attackRange;
+    protected float physicalDamage;
+    protected float magicDamage;
+    protected float armourPenetration;
+    protected float magicResistPenetration;
+    protected float attackSpeed;
+    protected bool canAttack;
+    protected bool isAttackReseting;
+    protected float maxHealth;
+    protected float health;
+    protected float armour;
+    protected float magicResist;
+    protected bool isMelee;
 
     #region Functions
 
@@ -58,7 +61,7 @@ public class Entity : MonoBehaviour
         if (!isAttackReseting && !canAttack)
         {
             isAttackReseting = true;
-            yield return new WaitForSeconds(attackRate);
+            yield return new WaitForSeconds(attackSpeed);
             canAttack = true;
             isAttackReseting = false;
         }

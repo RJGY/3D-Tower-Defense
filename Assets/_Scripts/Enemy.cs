@@ -19,24 +19,13 @@ public class Enemy : Entity
     [SerializeField] private LayerMask towerLayer;
     private Transform endPathTransform;
     private cakeslice.Outline outline;
+    private float moveSpeed;
 
     [Header("Enemy Statistics")]
     private EnemyType enemyType;
     private EnemySpecies enemyArt;
     private int livesWorth;
     private float goldReward;
-
-    [Header("Enemy Attack Variables")]
-    [SerializeField] private float attackRange;
-    private float attackDamage;
-    private float magicDamage;
-    private float attackRate;
-    private bool canAttack;
-    private float maxHealth;
-    private float health;
-    private float moveSpeed;
-    private float armour;
-    private float magicResist;
     
     private Transform targetedTransform;
 
@@ -84,7 +73,7 @@ public class Enemy : Entity
         EnemySpawner.instance.EnemySpawned -= EnemySpawner_EnemySpawned;
 
         // Unsubscrive Events
-        MouseManager.Instance.EnemyDeselected -= EnemyDeselected;
+        MouseManager.Instance.EnemyDeselected -= UnhighlightEnemy;
         MouseManager.Instance.EnemySelected -= EnemySelected;
     }
 
@@ -98,7 +87,7 @@ public class Enemy : Entity
     private void Start()
     {
         // Subscribe events
-        MouseManager.Instance.EnemyDeselected += EnemyDeselected;
+        MouseManager.Instance.EnemyDeselected += UnhighlightEnemy;
         MouseManager.Instance.EnemySelected += EnemySelected;
 
         // Call functions.
@@ -133,13 +122,8 @@ public class Enemy : Entity
     {
         if (position == transform.position)
         {
-            HighlightEnemy();
+            outline.eraseRenderer = false;
         }
-    }
-
-    private void EnemyDeselected()
-    {
-        UnhighlightEnemy();
     }
 
     private void GoToEnd()
@@ -159,9 +143,9 @@ public class Enemy : Entity
     {
         // Assign Variables
         // Put this into a switch statement later.
-        attackRate = 0.2f;
+        attackSpeed = 0.2f;
         attackRange = 1.5f;
-        attackDamage = 10f;
+        physicalDamage = 10f;
         maxHealth = 10;
         health = maxHealth;
         moveSpeed = 3.5f;
@@ -227,9 +211,9 @@ public class Enemy : Entity
 
                 // Deal Damage
                 // Damage should be dealt through animation event.
-                Debug.Log("I dealt " + attackDamage + " damage.");
+                Debug.Log("I dealt damage.");
                 Player player = FindObjectsOfType<Player>().Where(p => p.transform.position == targetedTransform.position).FirstOrDefault();
-                player.TakeDamage(attackDamage, magicDamage);
+                player.TakeDamage(physicalDamage, magicDamage);
 
                 // Attack reset.
                 targetedTransform = null;
@@ -262,7 +246,7 @@ public class Enemy : Entity
 
                 // Deal Damage
                 // Damage should be dealt through animation event.
-                Debug.Log("I dealt " + attackDamage + " damage.");
+                Debug.Log("I dealt damage.");
                 //Destroy(targetedTransform.gameObject);
                 Turrets turret = FindObjectsOfType<Turrets>().Where(t => t.transform.position == targetedTransform.position).FirstOrDefault();
                 
