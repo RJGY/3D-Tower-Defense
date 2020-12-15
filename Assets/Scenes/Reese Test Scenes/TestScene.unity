@@ -3437,7 +3437,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nodeLayer:
     serializedVersion: 2
-    m_Bits: 8192
+    m_Bits: 32256
   groundLayer:
     serializedVersion: 2
     m_Bits: 16384
@@ -5685,7 +5685,7 @@ PrefabInstance:
     - target: {fileID: 5953086354239348770, guid: bd174dc9116de3848a454797da94df2f,
         type: 3}
       propertyPath: m_StoppingDistance
-      value: 0.1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5953086354239348770, guid: bd174dc9116de3848a454797da94df2f,
         type: 3}

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Entity : MonoBehaviour
 {
+    [Header("")]
+
     [Header("Combat Variables")]
     protected float attackRange;
     protected float physicalDamage;
@@ -48,27 +50,9 @@ public class Entity : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void Attack()
-    {
-        
-    }
-
     #endregion
 
     #region Coroutines
-    protected IEnumerator AttackCooldown()
-    {
-        if (!isAttackReseting && !canAttack)
-        {
-            isAttackReseting = true;
-            yield return new WaitForSeconds(attackSpeed);
-            canAttack = true;
-            isAttackReseting = false;
-        }
-        else
-        {
-            yield return new WaitForEndOfFrame();
-        }
-    }
+
     #endregion
 }

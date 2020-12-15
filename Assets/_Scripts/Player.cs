@@ -13,8 +13,9 @@ public class Player : Entity
 
 
     [Header("Combat Properties")]
-    private Enemy currentEnemy;
+    [SerializeField] private Enemy currentEnemy;
     private Animator animator;
+    private float moveSpeed;
     #endregion
 
     #region Monobehaviour
@@ -64,12 +65,12 @@ public class Player : Entity
         {
             Attack(currentEnemy);
         }
-        else if (currentEnemy == null && new Vector2(agent.destination.x, agent.destination.z) != lastPosition)
+        else if (new Vector2(agent.destination.x, agent.destination.z) != lastPosition)
         {
             StopAttackingNullEnemy();
         }
 
-        if (animator.GetBool("isAttacking"))
+        if (animator.GetBool("stoppedToAttack"))
         {
             // Player stops to attack.
             agent.SetDestination(transform.position);
@@ -80,33 +81,55 @@ public class Player : Entity
 
     #region Functions
 
-    private void AssignStats2()
+    private new void AssignStats()
     {
+        base.AssignStats();
         maxHealth = 100;
         health = maxHealth;
         physicalDamage = 1;
         magicDamage = 1;
-        attackRange = 1;
+        attackRange = 2;
         attackSpeed = 0.5f;
         agent.updateRotation = false;
         canAttack = true;
+        moveSpeed = 3.5f;
+        agent.speed = moveSpeed;
+        animator.SetFloat("attackSpeed", attackSpeed);
+        animator.SetFloat("moveSpeed", Mathf.Sqrt(moveSpeed / 3.5f));
+        isMelee = false;
     }
 
-    void StopAttackingNullEnemy()
+    private void StopAttackingNullEnemy()
     {
-        Debug.Log(agent.destination);
-        Debug.Log(lastPosition);
         agent.SetDestination(transform.position);
         lastPosition = new Vector2(transform.position.x, transform.position.z);
     }
 
-    void InstantRotation()
+    private void InstantRotation()
     {
+        // Get Quaternion to look at based on movement.
         var _lookRotation = Quaternion.LookRotation(agent.velocity.normalized);
 
+        // Look towards _lookRotation.
         transform.rotation = Quaternion.RotateTowards(transform.rotation, _lookRotation, 8);
+    }
 
-        
+
+    private void MeleeToggle()
+    {
+        // Toggle melee weapon collider to deal damage to enemies.
+    }
+
+    private void SpawnAttackProjectile(Entity enemy)
+    {
+        // Spawn bullet and shoot at enemy
+    }
+
+    private void ResetAttack()
+    {
+        // Player finishes attack animation and resets.
+        animator.SetBool("stoppedToAttack", false);
+        canAttack = true;
     }
 
     private void Attack(Enemy enemy)
@@ -123,20 +146,14 @@ public class Player : Entity
             Debug.Log("I am in range of the enemy and i am attempting to attack");
             if (canAttack)
             {
-                // Player does animation to attack
-                animator.SetBool("isAttacking", true);
-
-                // Player hits enemy.
-                Debug.Log("The player has attacked " + currentEnemy.name);
-                currentEnemy.TakeDamage(physicalDamage, magicDamage);
+                // Set animator to attack.
                 canAttack = false;
-
-                // Player attack cooldown
-                StartCoroutine(AttackCooldown());
+                animator.SetTrigger("isAttacking");
+                animator.SetBool("stoppedToAttack", false);
             }
             else
             {
-                // Still in attack cooldown
+                // Still in attack cooldown.
 
             }
 
@@ -144,10 +161,7 @@ public class Player : Entity
         else
         {
             // Player pathfind to enemy
-            if (agent.destination != currentEnemy.transform.position)
-            {
-                agent.SetDestination(currentEnemy.transform.position);
-            }
+            agent.SetDestination(currentEnemy.transform.position);
         }
     }
 

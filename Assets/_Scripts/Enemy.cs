@@ -139,8 +139,9 @@ public class Enemy : Entity
         }
     }
 
-    private void AssignStats2()
+    private new void AssignStats()
     {
+        base.AssignStats();
         // Assign Variables
         // Put this into a switch statement later.
         attackSpeed = 0.2f;
@@ -218,7 +219,7 @@ public class Enemy : Entity
                 // Attack reset.
                 targetedTransform = null;
                 canAttack = false;
-                StartCoroutine(AttackCooldown());
+                //StartCoroutine(AttackCooldown());
                 GoToEnd();
             }
         }
@@ -254,7 +255,7 @@ public class Enemy : Entity
                 // Attack reset.
                 targetedTransform = null;
                 canAttack = false;
-                StartCoroutine(AttackCooldown());
+                //StartCoroutine(AttackCooldown());
                 GoToEnd();
             }
         }
