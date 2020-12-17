@@ -11,11 +11,12 @@ public class Player : Entity
     private NavMeshAgent agent;
     private Vector2 lastPosition;
 
-
     [Header("Combat Properties")]
     [SerializeField] private Enemy currentEnemy;
     private Animator animator;
     private float moveSpeed;
+    private Projectile projectilePrefab;
+    [SerializeField] private LayerMask enemyLayer;
     #endregion
 
     #region Monobehaviour
@@ -31,9 +32,7 @@ public class Player : Entity
     {
         
     }
-
     
-
     void OnDisable()
     {
         MouseManager.Instance.PlayerMoved -= MovePlayer;
@@ -51,7 +50,13 @@ public class Player : Entity
     // Update is called once per frame
     void Update()
     {
-        if (agent.velocity.sqrMagnitude > Mathf.Epsilon)
+        if (stoppedToAttack)
+        {
+            // Player stops to attack.
+            agent.velocity = Vector3.zero;
+            agent.ResetPath();
+        }
+        else if (agent.velocity.sqrMagnitude > Mathf.Epsilon)
         {
             InstantRotation();
             animator.SetBool("isRunning", true);
@@ -70,11 +75,7 @@ public class Player : Entity
             StopAttackingNullEnemy();
         }
 
-        if (animator.GetBool("stoppedToAttack"))
-        {
-            // Player stops to attack.
-            agent.SetDestination(transform.position);
-        }
+        
     }
 
     #endregion
@@ -120,15 +121,21 @@ public class Player : Entity
         // Toggle melee weapon collider to deal damage to enemies.
     }
 
-    private void SpawnAttackProjectile(Entity enemy)
+    private void SpawnAttackProjectile()
     {
         // Spawn bullet and shoot at enemy
+        Debug.Log("spawned bullet");
+        Projectile projectile = Instantiate(projectilePrefab);
+        projectile.AssignStats(physicalDamage, magicDamage, enemyLayer);
     }
 
-    private void ResetAttack()
+    private void CanMove()
     {
-        // Player finishes attack animation and resets.
-        animator.SetBool("stoppedToAttack", false);
+        stoppedToAttack = false;
+    }
+
+    private void CanAttack()
+    {
         canAttack = true;
     }
 
@@ -149,7 +156,7 @@ public class Player : Entity
                 // Set animator to attack.
                 canAttack = false;
                 animator.SetTrigger("isAttacking");
-                animator.SetBool("stoppedToAttack", false);
+                stoppedToAttack = true;
             }
             else
             {
@@ -167,6 +174,11 @@ public class Player : Entity
 
     private void MovePlayer(Vector3 position)
     {
+        if (stoppedToAttack)
+        {
+            return;
+        }
+
         agent.SetDestination(position);
         lastPosition = new Vector2(agent.destination.x, agent.destination.z);
         currentEnemy = null;

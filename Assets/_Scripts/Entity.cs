@@ -20,7 +20,7 @@ public class Entity : MonoBehaviour
     protected float armour;
     protected float magicResist;
     protected bool isMelee;
-
+    [SerializeField] protected bool stoppedToAttack;
     #region Functions
 
     protected void AssignStats()
