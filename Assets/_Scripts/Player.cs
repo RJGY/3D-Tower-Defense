@@ -15,8 +15,10 @@ public class Player : Entity
     [SerializeField] private Enemy currentEnemy;
     private Animator animator;
     private float moveSpeed;
-    private Projectile projectilePrefab;
+    [SerializeField] private Projectile projectilePrefab;
     [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private float projectileSpeed;
+    [SerializeField] protected bool stoppedToAttack;
     #endregion
 
     #region Monobehaviour
@@ -87,7 +89,7 @@ public class Player : Entity
         base.AssignStats();
         maxHealth = 100;
         health = maxHealth;
-        physicalDamage = 1;
+        physicalDamage = 5;
         magicDamage = 1;
         attackRange = 2;
         attackSpeed = 0.5f;
@@ -124,9 +126,8 @@ public class Player : Entity
     private void SpawnAttackProjectile()
     {
         // Spawn bullet and shoot at enemy
-        Debug.Log("spawned bullet");
-        Projectile projectile = Instantiate(projectilePrefab);
-        projectile.AssignStats(physicalDamage, magicDamage, enemyLayer);
+        Projectile projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+        projectile.AssignStats(physicalDamage, magicDamage, enemyLayer, currentEnemy.transform, projectileSpeed);
     }
 
     private void CanMove()
@@ -150,18 +151,23 @@ public class Player : Entity
         // Player is in range of enemy
         if (Vector3.Distance(transform.position, enemy.transform.position) <= attackRange)
         {
-            Debug.Log("I am in range of the enemy and i am attempting to attack");
             if (canAttack)
             {
+                
+
                 // Set animator to attack.
                 canAttack = false;
                 animator.SetTrigger("isAttacking");
                 stoppedToAttack = true;
             }
-            else
+            else if(!canAttack && !stoppedToAttack)
             {
                 // Still in attack cooldown.
+                // Get Quaternion to look at based on movement.
+                var _lookRotation = Quaternion.LookRotation(-currentEnemy.transform.position);
 
+                // Look towards _lookRotation.
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, _lookRotation, 8);
             }
 
         }
