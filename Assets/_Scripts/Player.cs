@@ -18,7 +18,7 @@ public class Player : Entity
     [SerializeField] private Projectile projectilePrefab;
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private float projectileSpeed;
-    [SerializeField] protected bool stoppedToAttack;
+
     #endregion
 
     #region Monobehaviour

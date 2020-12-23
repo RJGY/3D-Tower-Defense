@@ -26,7 +26,8 @@ public class Enemy : Entity
     private EnemySpecies enemyArt;
     private int livesWorth;
     private float goldReward;
-    
+    private float engageRange;
+
     private Transform targetedTransform;
 
     [Header("Enemy UI")]
@@ -102,7 +103,7 @@ public class Enemy : Entity
     // Update is called once per frame
     private void Update()
     {
-        
+
     }
     #endregion
 
@@ -225,6 +226,12 @@ public class Enemy : Entity
         }
     }
 
+    private void ResetAttack()
+    {
+        canAttack = true;
+        stoppedToAttack = false;
+    }
+
     private void AttackTurret()
     {
         // Find closest enemy
@@ -236,7 +243,7 @@ public class Enemy : Entity
         {
             agent.SetDestination(targetedTransform.transform.position);
         }
-        
+
         // Attack closest turret.
         if (Vector3.Distance(transform.position, targetedTransform.position) < attackRange)
         {
@@ -250,7 +257,7 @@ public class Enemy : Entity
                 Debug.Log("I dealt damage.");
                 //Destroy(targetedTransform.gameObject);
                 Turrets turret = FindObjectsOfType<Turrets>().Where(t => t.transform.position == targetedTransform.position).FirstOrDefault();
-                
+
 
                 // Attack reset.
                 targetedTransform = null;
@@ -259,12 +266,12 @@ public class Enemy : Entity
                 GoToEnd();
             }
         }
-    }       
+    }
 
     private Transform FindClosestTower()
     {
         // Define our search radius.
-        float searchRadius = agent.radius + 8; 
+        float searchRadius = agent.radius + 8;
         // Define turret variable
         Transform closestTurret = null;
         Collider[] turrets = Physics.OverlapSphere(transform.position, searchRadius, towerLayer);
@@ -294,9 +301,11 @@ public class Enemy : Entity
     private new void Die()
     {
         // Give gold reward to gamemanager.
-        
+
         // Destroy gameobject
-        Destroy(gameObject);
+
+        // Do baseclass die method.
+        base.Die();
     }
     #endregion
 
@@ -314,6 +323,8 @@ public class Enemy : Entity
         else if (!agent.pathPending && (!agent.hasPath || agent.velocity.sqrMagnitude == 0f))
         {
             // Attack
+
+
             AttackTurret();
         }
 
@@ -321,7 +332,8 @@ public class Enemy : Entity
         StartCoroutine(CheckPath());
     }
 
-
     
+
+
     #endregion
 }
