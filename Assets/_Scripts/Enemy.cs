@@ -220,7 +220,7 @@ public class Enemy : Entity
 
                 if (enemy == null)
                 {
-                    agent.SetDestination(endPathTransform.position);
+                    GoToEnd();
                 }
             }
         }
@@ -238,6 +238,12 @@ public class Enemy : Entity
         // Find closest enemy
         if (targetedTransform == null)
             targetedTransform = FindClosestTower();
+
+        if (targetedTransform == null)
+        {
+            GoToEnd();
+            return;
+        }
 
         // Pathfind towards turret
         if (agent.destination != targetedTransform.transform.position)
