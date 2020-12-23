@@ -38,6 +38,7 @@ public class Player : Entity
     void OnDisable()
     {
         MouseManager.Instance.PlayerMoved -= MovePlayer;
+        MouseManager.Instance.PlayerAttacked -= Attack;
     }
 
     // Start is called before the first frame update
@@ -153,8 +154,6 @@ public class Player : Entity
         {
             if (canAttack)
             {
-                
-
                 // Set animator to attack.
                 canAttack = false;
                 animator.SetTrigger("isAttacking");

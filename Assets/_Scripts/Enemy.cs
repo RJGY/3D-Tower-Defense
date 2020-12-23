@@ -153,6 +153,7 @@ public class Enemy : Entity
         moveSpeed = 3.5f;
         agent.speed = moveSpeed;
         canAttack = true;
+        engageRange = 5f;
         UnhighlightEnemy();
     }
 
@@ -169,38 +170,36 @@ public class Enemy : Entity
         //Gizmos.DrawWireSphere(transform.position, Mathf.Min(agent.radius * 10, agent.radius + 10));
     }
 
-    private void AttackPlayer()
+    private Transform CheckPlayer()
     {
         // Find all players
         Transform[] players = FindObjectsOfType<Player>().Select(player => player.transform).ToArray(); ;
 
-        // Assign player to targetedTransform.
-        if (players.Length == 1)
+        foreach (Transform player in players)
         {
-            targetedTransform = players[0].transform;
-        }
-        else
-        {
-            foreach (Transform player in players)
+            if (Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(player.position.x, player.position.z)) < engageRange)
             {
-                if (targetedTransform == null)
-                {
-                    targetedTransform = player;
-                }
-                else
-                {
-                    if (Vector3.Distance(player.position, transform.position) < Vector3.Distance(transform.position, targetedTransform.position))
-                    {
-                        targetedTransform = player;
-                    }
-                }
-            }
+                return player;
+            }            
         }
 
-        // Pathfind to player.
-        if (agent.destination != targetedTransform.transform.position)
+        return null;
+    }
+
+
+    private void AttackPlayer(Transform player)
+    {
+        if (player == null)
         {
-            agent.SetDestination(targetedTransform.transform.position);
+            return;
+        }
+
+        targetedTransform = player;
+        
+        // Pathfind to player.
+        if (agent.destination != targetedTransform.position)
+        {
+            agent.SetDestination(targetedTransform.position);
         }
 
         // Attack player.
@@ -214,20 +213,22 @@ public class Enemy : Entity
                 // Deal Damage
                 // Damage should be dealt through animation event.
                 Debug.Log("I dealt damage.");
-                Player player = FindObjectsOfType<Player>().Where(p => p.transform.position == targetedTransform.position).FirstOrDefault();
-                player.TakeDamage(physicalDamage, magicDamage);
+                Player enemy = FindObjectsOfType<Player>().Where(p => p.transform.position == targetedTransform.position).FirstOrDefault();
+                DealDamage(enemy);
 
-                // Attack reset.
-                targetedTransform = null;
-                canAttack = false;
-                //StartCoroutine(AttackCooldown());
-                GoToEnd();
+                ResetAttack();
+
+                if (enemy == null)
+                {
+                    agent.SetDestination(endPathTransform.position);
+                }
             }
         }
     }
 
     private void ResetAttack()
     {
+        targetedTransform = null;
         canAttack = true;
         stoppedToAttack = false;
     }
@@ -257,12 +258,9 @@ public class Enemy : Entity
                 Debug.Log("I dealt damage.");
                 //Destroy(targetedTransform.gameObject);
                 Turrets turret = FindObjectsOfType<Turrets>().Where(t => t.transform.position == targetedTransform.position).FirstOrDefault();
+                DealDamage(turret);
 
-
-                // Attack reset.
-                targetedTransform = null;
-                canAttack = false;
-                //StartCoroutine(AttackCooldown());
+                ResetAttack();
                 GoToEnd();
             }
         }
@@ -320,11 +318,14 @@ public class Enemy : Entity
             // End reached.
             OnReachEnd();
         }
+        
+        if (CheckPlayer() != null)
+        {
+            AttackPlayer(CheckPlayer());
+        }
         else if (!agent.pathPending && (!agent.hasPath || agent.velocity.sqrMagnitude == 0f))
         {
-            // Attack
-
-
+            // Attack turrets
             AttackTurret();
         }
 
